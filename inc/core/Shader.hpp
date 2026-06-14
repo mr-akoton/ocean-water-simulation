@@ -1,39 +1,39 @@
 #ifndef SHADER_HPP
-# define SHADER_HPP
+#define SHADER_HPP
 
-# include <glad/glad.h>
-# include <GLFW/glfw3.h>
-# include <glm/glm.hpp>
-# include <glm/gtc/type_ptr.hpp>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
-# include <string>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
-class	Shader {
-	private:
-		GLuint			_id;
-		std::string	_vertexShaderFile;
-		std::string _fragmentShaderFile;
-	
-	public:
-		Shader(const std::string vertex, const std::string fragment);
-		~Shader();
+#include <string>
 
-		void	enable(void) const;
-	
-		void	setInt(const std::string& uniform, int value) const;
-		void	setBool(const std::string& uniform, bool value) const;
-		void	setFloat(const std::string& uniform, float value) const;
-		void	setVec2(const std::string& uniform, const glm::vec2& value) const;
-		void	setVec3(const std::string& uniform, const glm::vec3& value) const;
-		void	setVec4(const std::string& uniform, const glm::vec4& value) const;
-		void	setMat2(const std::string& uniform, const glm::mat2& value) const;
-		void	setMat3(const std::string& uniform, const glm::mat3& value) const;
-		void	setMat4(const std::string& uniform, const glm::mat4& value) const;
+class Shader {
+private:
+  GLuint _id;
+  std::string _vertexShaderFile;
+  std::string _fragmentShaderFile;
 
-	private:
-		void	_debugShaderCompilation(GLuint id, std::string file) const;
-		void	_debugProgramLink(GLuint id) const;
-		
+public:
+  Shader(const std::string vertex, const std::string fragment);
+  ~Shader();
+
+  void enable(void) const;
+
+  void setInt(const std::string& uniform, int value) const;
+  void setBool(const std::string& uniform, bool value) const;
+  void setFloat(const std::string& uniform, float value) const;
+  void setVec2(const std::string& uniform, const glm::vec2& value) const;
+  void setVec3(const std::string& uniform, const glm::vec3& value) const;
+  void setVec4(const std::string& uniform, const glm::vec4& value) const;
+  void setMat2(const std::string& uniform, const glm::mat2& value) const;
+  void setMat3(const std::string& uniform, const glm::mat3& value) const;
+  void setMat4(const std::string& uniform, const glm::mat4& value) const;
+
+private:
+  void _debugShaderCompilation(GLuint id, std::string file) const;
+  void _debugProgramLink(GLuint id) const;
 };
 
 #endif

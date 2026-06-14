@@ -1,15 +1,16 @@
 #ifndef OBJECT_HPP
-# define OBJECT_HPP
+#define OBJECT_HPP
 
-# include <glad/glad.h>
-# include <GLFW/glfw3.h>
-# include <glm/glm.hpp>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
-# include <vector>
+#include <glm/glm.hpp>
 
-struct	Vertex {
-	glm::vec3	position;
-	glm::vec3	color;
+#include <vector>
+
+struct Vertex {
+  glm::vec3 position;
+  glm::vec3 color;
 };
 
 /* ========================================================================== */
@@ -18,55 +19,51 @@ struct	Vertex {
 
 class VBO;
 
-class	VAO {
-	private:
-		GLuint	_id;
-	
-	public:
-		VAO(void);
-		~VAO();
+class VAO {
+private:
+  GLuint _id;
 
-		void	bind(void) const;
-		void	unbind(void) const;
-		void	linkAttribute(const VBO& vbo,
-											  GLuint index,
-												GLint size,
-												GLenum type,
-												GLsizei stride,
-												const void *pointer) const;
+public:
+  VAO(void);
+  ~VAO();
+
+  void bind(void) const;
+  void unbind(void) const;
+  void linkAttribute(const VBO& vbo, GLuint index, GLint size, GLenum type,
+                     GLsizei stride, const void* pointer) const;
 };
 
 /* ========================================================================== */
 /*                            VERTEXT BUFFER OBJECT                           */
 /* ========================================================================== */
 
-class	VBO {
-	private:
-		GLuint	_id;
-	
-	public:
-		VBO(const std::vector<Vertex>& vertices);
-		VBO(const std::vector<glm::vec3>& vertices);
-		~VBO();
+class VBO {
+private:
+  GLuint _id;
 
-		void	bind(void) const; 
-		void	unbind(void) const; 
+public:
+  VBO(const std::vector<Vertex>& vertices);
+  VBO(const std::vector<glm::vec3>& vertices);
+  ~VBO();
+
+  void bind(void) const;
+  void unbind(void) const;
 };
 
 /* ========================================================================== */
 /*                            ELEMENT BUFFER OBJECT                           */
 /* ========================================================================== */
 
-class	EBO {
-	private:
-		GLuint	_id;
-	
-	public:
-		EBO(const std::vector<GLuint>& indices);
-		~EBO();
+class EBO {
+private:
+  GLuint _id;
 
-		void	bind(void) const;
-		void	unbind(void) const;
+public:
+  EBO(const std::vector<GLuint>& indices);
+  ~EBO();
+
+  void bind(void) const;
+  void unbind(void) const;
 };
 
 #endif

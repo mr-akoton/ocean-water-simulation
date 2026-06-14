@@ -1,47 +1,48 @@
 #ifndef CAMERA_HPP
-# define CAMERA_HPP
+#define CAMERA_HPP
 
-# ifndef GLM_ENABLE_EXPERIMENTAL
-#  define GLM_ENABLE_EXPERIMENTAL
-# endif
+#ifndef GLM_ENABLE_EXPERIMENTAL
+#define GLM_ENABLE_EXPERIMENTAL
+#endif
 
-# include <glad/glad.h>
-# include <GLFW/glfw3.h>
-# include <glm/glm.hpp>
-# include <glm/gtc/matrix_transform.hpp>
-# include <glm/gtc/type_ptr.hpp>
-# include <glm/gtx/rotate_vector.hpp>
-# include <glm/gtx/vector_angle.hpp>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
-# include <core/Shader.hpp>
-# include <core/Window.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtx/vector_angle.hpp>
 
-class	Camera {
-	public:
-		bool 					isFirstClick;
+#include <core/Shader.hpp>
+#include <core/Window.hpp>
 
-		unsigned int	width;
-		unsigned int	height;
-		float					ratio;
-		float					speed;
-		float					sensitivity;
-		
-		glm::vec3	up;
-		glm::vec3	position;
-		glm::vec3	orientation;
-		glm::mat4	matrix;
+class Camera {
+public:
+  bool isFirstClick;
 
-	public:
-		Camera(unsigned int width, unsigned int height, glm::vec3 position);
+  unsigned int width;
+  unsigned int height;
+  float ratio;
+  float speed;
+  float sensitivity;
 
-		void	handleInput(const Window& window, float deltaTime);
-		void	updateMatrix(float fov, float near, float far);
-		void	updateShaderMatrix(const Shader& shader,
-														 const std::string uniform) const;
+  glm::vec3 up;
+  glm::vec3 position;
+  glm::vec3 orientation;
+  glm::mat4 matrix;
 
-	private:
-		void	_handleKeyInput(const Window& window, float deltaTime);
-		void	_handleMouseInput(const Window& window);
+public:
+  Camera(unsigned int width, unsigned int height, glm::vec3 position);
+
+  void handleInput(const Window& window, float deltaTime);
+  void updateMatrix(float fov, float near, float far);
+  void updateShaderMatrix(const Shader& shader,
+                          const std::string uniform) const;
+
+private:
+  void _handleKeyInput(const Window& window, float deltaTime);
+  void _handleMouseInput(const Window& window);
 };
 
 #endif

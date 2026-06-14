@@ -3,77 +3,105 @@
 layout(location = 0) in vec3 in_position;
 layout(location = 1) in vec3 in_color;
 
+#define PI 3.14159265359
+
 uniform mat4 u_projection;
 uniform mat4 u_model;
 uniform mat3 u_imodel;
 uniform float u_time;
 
+uniform int u_waveIteration;
+uniform float u_amplitude;
 uniform float u_frequency;
 uniform float u_speed;
-uniform float u_amplitude;
-uniform float u_iterationSeed;
-uniform float u_speedScale;
-uniform float u_frequencyScale;
-uniform float u_amplitudeScale;
+uniform float u_drag;
+uniform float u_peakMax;
+uniform float u_peakOffset;
 
-uniform int u_waveIteration;
-uniform	float u_waveRool;
-uniform	float u_waveSteepness;
+uniform float u_amplitudeMult;
+uniform float u_frequencyMult;
+uniform float u_speedMult;
+uniform float u_iterationMult;
 
 out vec3 p_fragPosition;
 out vec3 p_color;
 out vec3 p_normal;
 
-vec3	getWaveDisplacement(vec2 position, vec2 direction, float amplitude, float frequency, float speed, float steepness) {
-	float	theta = dot(direction, position) * frequency + u_time * speed;
-	
-	float	y = amplitude * sin(theta);
-	vec2	xz = steepness * amplitude * direction * cos(theta);
+// Fractal wave synthesis (FBM-like sum of directional exponential waves)
+//
+// Base wave for each octave i:
+//
+//   O = dot(d_i, x) * f_i + t * s_i
+//   W_i(x,t) = A_i * exp(k * sin(O) - b)
+//
+// where:
+//   d_i : wave direction
+//   A_i : amplitude
+//   f_i : frequency
+//   s_i : phase speed
+//   k   : u_peakMax    (crest sharpness)
+//   b   : u_peakOffset (vertical normalization)
+//
+// Total height:
+//
+//   H(x,t) = Sum[ W_i(x,t) ]
+//
+// Surface gradient:
+//
+//   H = Sum[ d_i * (f_i * A_i * k * exp(k * sin(O) - b) * cos(O)) ]
+//
+// Each octave updates amplitude, frequency, and speed to create
+// a fractal (FBM) ocean surface. Position is also advected by the
+// wave gradient (drag term) to introduce nonlinear wave interaction.
 
-	return vec3(xz.x, y, xz.y);
+vec3 getWavesFBM(vec2 position) {
+    float iteration = 0.0;
+    float amplitude = u_amplitude;
+    float frequency = u_frequency;
+    float speed = u_speed;
+
+    // Outputed value
+    float height = 0.0;
+    vec2 derivative = vec2(0.0);
+
+    for (int i = 0; i < u_waveIteration; i++) {
+        // Generate arbitrary direction
+        vec2 direction = normalize(vec2(cos(iteration), sin(iteration)));
+
+        float theta = dot(direction, position.xy) * frequency + u_time * speed;
+        float sinTheta = sin(theta);
+        float cosTheta = cos(theta);
+        float expSine = exp(u_peakMax * sinTheta - u_peakOffset);
+        float derivExpSine = u_peakMax * expSine * cosTheta;
+
+        // 1. Accumulate wave displacement
+        height += amplitude * expSine;
+
+        // 2. Accumulate derivatives
+        float WA = frequency * amplitude;
+        derivative.x += direction.x * WA * derivExpSine;
+        derivative.y += direction.y * WA * derivExpSine;
+        position.xy -= direction * derivExpSine * amplitude * u_drag;
+
+        // 3. Update wave parameters for next octave
+        amplitude *= u_amplitudeMult;
+        frequency *= u_frequencyMult;
+        speed *= u_speedMult;
+        iteration += u_iterationMult;
+    }
+
+    return vec3(derivative.x, height, derivative.y);
 }
 
-void	main() {
-	vec3	totalDisplacement = vec3(0.0f);
-	vec3	normalData = vec3(0.0f);
-	vec3	position = in_position;
-	float	waveIteration = 1.0f;
+void main() {
+    vec3 waves = getWavesFBM(in_position.xz);
 
-	float	amplitude = u_amplitude;
-	float	frequency = u_frequency;
-	float	speed = u_speed;
+    vec3 finalPosition = vec3(in_position.x, in_position.y + waves.y, in_position.z);
+    vec4 worldPosition = u_model * vec4(finalPosition, 1.0);
+    vec3 normal = vec3(-waves.x, 1.0, -waves.z);
 
-	// Sum of waves
-	for (int i = 0; i < u_waveIteration; i++) {
-		vec2	direction = normalize(vec2(sin(waveIteration), cos(waveIteration)));
-
-		float 	steepness = u_waveSteepness / (frequency * amplitude * u_waveIteration);
-		vec3	displacement = getWaveDisplacement(position.xz, direction, amplitude, frequency, speed, steepness);
-		
-		totalDisplacement += displacement;
-
-		float	theta = dot(direction, position.xz) * frequency + u_time * speed;
-		normalData.x += direction.x * frequency * amplitude * cos(theta);
-		normalData.z += direction.y * frequency * amplitude * cos(theta);
-		normalData.y += steepness * frequency * amplitude * sin(theta);
-
-		amplitude *= u_amplitudeScale;
-		frequency *= u_frequencyScale;
-		speed *= u_speedScale;
-		waveIteration += u_iterationSeed;
-	}
-
-	// Extract final data
-	vec3 normal = normalize(vec3(-normalData.x, 1 - normalData.y, -normalData.z));
-	normal = normalize(u_imodel * normal);
-
-	// Vertex position
-	vec4 worldPosition = u_model * vec4(in_position + totalDisplacement, 1.0);
-	gl_Position = u_projection * worldPosition;
-
-	// Pass to vertex
-	p_fragPosition = worldPosition.xyz;
-	p_normal = normal;
-	p_color = in_color;
+    gl_Position = u_projection * worldPosition;
+    p_fragPosition = worldPosition.xyz;
+    p_color = in_color;
+    p_normal = normalize(u_imodel * normal);
 }
-
