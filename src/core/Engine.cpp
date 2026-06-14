@@ -1,16 +1,14 @@
+#include "components/Water.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "imgui/imgui.h"
 #include <core/Engine.hpp>
+#include <components/CubeMap.hpp>
 
 using namespace glm;
 
 /* ========================================================================== */
 /*                         CONSTRUCTOR AND DESTRUCTOR                         */
 /* ========================================================================== */
-
-constexpr int WINDOW_WIDTH = 1280;
-constexpr int WINDOW_HEIGHT = 720;
-constexpr const char* WINDOW_TITLE = "OpenGL - Water";
 
 Engine::Engine(void)
     : camera(WINDOW_WIDTH, WINDOW_HEIGHT, vec3(250.0f, 150.0f, -100.0f)),
@@ -62,6 +60,8 @@ void Engine::run(void) {
   Water water(500, 500);
   water.init(vec3(0.172f, 0.3412f, 0.4667f));
 
+  CubeMap skybox((const char**)SKYBOX_FACES);
+
   vec3 lightDirection(-0.2f, -0.8f, -1.0f);
   vec3 lightColor(1.0f, 1.0f, 1.0f);
 
@@ -90,6 +90,7 @@ void Engine::run(void) {
     }
 
     water.render(camera, lightDirection, lightColor);
+    skybox.render(camera);
 
     interface.createFrame();
     ImGui::Begin("Setting");

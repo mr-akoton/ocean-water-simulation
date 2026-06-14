@@ -47,6 +47,7 @@ EXT_FILE	:= imgui/imgui_draw.cpp \
 			   stb/stb_image.cpp
 
 SRC_FILE	:= components/Camera.cpp \
+				components/CubeMap.cpp \
 			   components/Water.cpp \
 			   components/Interface.cpp \
 			   core/objects/EBO.cpp \
