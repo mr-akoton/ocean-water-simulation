@@ -91,7 +91,8 @@ void Engine::run(void) {
   // Post process
   Shader ppShader("shader/postpro-vertex.glsl", "shader/postpro-fragment.glsl");
   ppShader.enable();
-  ppShader.setInt("u_textureCoords", 0);
+  ppShader.setInt("u_colorTexture", 0);
+  ppShader.setInt("u_depthTexture", 1);
 
   VAO ppvao;
   ppvao.bind();
@@ -108,6 +109,7 @@ void Engine::run(void) {
   glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
   GLuint frameBufferTexture;
+  glActiveTexture(GL_TEXTURE0);
   glGenTextures(1, &frameBufferTexture);
   glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WINDOW_WIDTH, WINDOW_HEIGHT, 0, GL_RGB,
@@ -119,13 +121,16 @@ void Engine::run(void) {
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
                          frameBufferTexture, 0);
 
-  GLuint rbo;
-  glGenRenderbuffers(1, &rbo);
-  glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, WINDOW_WIDTH,
-                        WINDOW_HEIGHT);
-  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
-                            GL_RENDERBUFFER, rbo);
+  GLuint depthTexture;
+  glActiveTexture(GL_TEXTURE1);
+  glGenTextures(1, &depthTexture);
+  glBindTexture(GL_TEXTURE_2D, depthTexture);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, WINDOW_WIDTH,
+               WINDOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
+                         depthTexture, 0);
 
   auto fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
   if (fboStatus != GL_FRAMEBUFFER_COMPLETE) {
@@ -161,9 +166,17 @@ void Engine::run(void) {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glDisable(GL_DEPTH_TEST);
-    ppShader.enable();
     ppvao.bind();
+    ppShader.enable();
+    ppShader.setVec3("u_fogColor", fogParams.color);
+    ppShader.setFloat("u_near", fogParams.near);
+    ppShader.setFloat("u_far", fogParams.far);
+    ppShader.setFloat("u_steepness", fogParams.steepnees);
+    ppShader.setFloat("u_offset", fogParams.offset);
+
     glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
+    glBindTexture(GL_TEXTURE_2D, depthTexture);
+
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glEnable(GL_DEPTH_TEST);
 
