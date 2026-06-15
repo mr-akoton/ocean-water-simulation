@@ -211,29 +211,7 @@
       "src/components/CubeMap.cpp"
     ],
     "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
-    "output": "src/components/Camera.o"
-  },
-  {
-    "file": "src/components/Water.cpp",
-    "arguments": [
-      "/usr/bin/g++",
-      "-Wall",
-      "-Wextra",
-      "-Wpedantic",
-      "-O0",
-      "-g",
-      "-std=c++17",
-      "-I",
-      "./inc",
-      "-I",
-      "./lib",
-      "-c",
-      "-o",
-      "src/components/Water.o",
-      "src/components/Water.cpp"
-    ],
-    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
-    "output": "src/components/Water.o"
+    "output": "src/components/CubeMap.o"
   },
   {
     "file": "src/components/Interface.cpp",
@@ -258,6 +236,50 @@
     "output": "src/components/Interface.o"
   },
   {
+    "file": "src/components/PostProcessFrame.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-O0",
+      "-g",
+      "-std=c++17",
+      "-I",
+      "./inc",
+      "-I",
+      "./lib",
+      "-c",
+      "-o",
+      "src/components/PostProcessFrame.o",
+      "src/components/PostProcessFrame.cpp"
+    ],
+    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
+    "output": "src/components/PostProcessFrame.o"
+  },
+  {
+    "file": "src/components/Water.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-O0",
+      "-g",
+      "-std=c++17",
+      "-I",
+      "./inc",
+      "-I",
+      "./lib",
+      "-c",
+      "-o",
+      "src/components/Water.o",
+      "src/components/Water.cpp"
+    ],
+    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
+    "output": "src/components/Water.o"
+  },
+  {
     "file": "src/core/objects/EBO.cpp",
     "arguments": [
       "/usr/bin/g++",
@@ -278,6 +300,50 @@
     ],
     "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
     "output": "src/core/objects/EBO.o"
+  },
+  {
+    "file": "src/core/objects/FBO.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-O0",
+      "-g",
+      "-std=c++17",
+      "-I",
+      "./inc",
+      "-I",
+      "./lib",
+      "-c",
+      "-o",
+      "src/core/objects/FBO.o",
+      "src/core/objects/FBO.cpp"
+    ],
+    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
+    "output": "src/core/objects/FBO.o"
+  },
+  {
+    "file": "src/core/objects/RBO.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-O0",
+      "-g",
+      "-std=c++17",
+      "-I",
+      "./inc",
+      "-I",
+      "./lib",
+      "-c",
+      "-o",
+      "src/core/objects/RBO.o",
+      "src/core/objects/RBO.cpp"
+    ],
+    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
+    "output": "src/core/objects/RBO.o"
   },
   {
     "file": "src/core/objects/VAO.cpp",

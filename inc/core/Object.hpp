@@ -42,6 +42,7 @@ private:
   GLuint _id;
 
 public:
+  VBO(void);
   VBO(const std::vector<Vertex>& vertices);
   VBO(const std::vector<glm::vec3>& vertices);
   VBO(const std::vector<glm::vec4>& vertices);
@@ -49,6 +50,9 @@ public:
 
   void bind(void) const;
   void unbind(void) const;
+  void bindData(const std::vector<Vertex>& vertices);
+  void bindData(const std::vector<glm::vec3>& vertices);
+  void bindData(const std::vector<glm::vec4>& vertices);
 };
 
 /* ========================================================================== */
@@ -60,9 +64,11 @@ private:
   GLuint _id;
 
 public:
+  EBO(void);
   EBO(const std::vector<GLuint>& indices);
   ~EBO();
 
+  void bindData(const std::vector<GLuint>& indices);
   void bind(void) const;
   void unbind(void) const;
 };

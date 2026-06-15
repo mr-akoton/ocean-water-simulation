@@ -44,6 +44,8 @@ public:
 
 private:
   VAO _vao;
+  VBO _vbo;
+  EBO _ebo;
   std::vector<Vertex> _vertices;
   std::vector<GLuint> _indices;
 

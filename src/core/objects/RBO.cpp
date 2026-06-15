@@ -8,8 +8,6 @@ RBO::RBO(int width, int height) {
   glGenRenderbuffers(1, &_id);
   this->bind();
   glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
-                            GL_RENDERBUFFER, _id);
   this->unbind();
 }
 

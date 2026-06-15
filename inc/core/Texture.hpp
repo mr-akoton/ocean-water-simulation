@@ -24,7 +24,6 @@ private:
   GLuint _unit;
 
 public:
-  Texture(FBO& fbo);
   Texture(const char* file, GLuint slot, GLenum format, GLenum pixType);
   ~Texture();
 

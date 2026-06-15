@@ -49,18 +49,18 @@ void Water::init() {
   }
 
   _vao.bind();
-  VBO vbo(_vertices);
-  vbo.bind();
-  EBO ebo(_indices);
-  ebo.bind();
+  _vbo.bindData(_vertices);
+  _vbo.bind();
+  _ebo.bindData(_indices);
+  _ebo.bind();
 
-  _vao.linkAttribute(vbo, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)(0));
-  _vao.linkAttribute(vbo, 1, 3, GL_FLOAT, sizeof(Vertex),
+  _vao.linkAttribute(_vbo, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)(0));
+  _vao.linkAttribute(_vbo, 1, 3, GL_FLOAT, sizeof(Vertex),
                      (void*)(3 * sizeof(float)));
 
   _vao.unbind();
-  vbo.unbind();
-  ebo.unbind();
+  _vbo.unbind();
+  _ebo.unbind();
 }
 
 /* ========================================================================== */

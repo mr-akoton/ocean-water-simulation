@@ -1,8 +1,12 @@
+#include "components/Camera.hpp"
 #include "components/Water.hpp"
+#include "core/Object.hpp"
+#include "core/Shader.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "imgui/imgui.h"
 #include <core/Engine.hpp>
 #include <components/CubeMap.hpp>
+#include <iostream>
 
 using namespace glm;
 
@@ -59,6 +63,15 @@ void Engine::_initGLAD(void) const {
 /*                                     RUN                                    */
 /* ========================================================================== */
 
+const std::vector<glm::vec4> PPVertices{
+    {-1.0f, -1.0f, 0.0f, 0.0f}, // 1
+    {+1.0f, -1.0f, 1.0f, 0.0f}, // 2
+    {+1.0f, +1.0f, 1.0f, 1.0f}, // 3
+    {-1.0f, -1.0f, 0.0f, 0.0f}, // 4
+    {+1.0f, +1.0f, 1.0f, 1.0f}, // 5
+    {-1.0f, +1.0f, 0.0f, 1.0f}, // 6
+};
+
 void Engine::run(void) {
   Water water(1000, 1000);
   water.init();
@@ -75,6 +88,50 @@ void Engine::run(void) {
   float lastTime = glfwGetTime();
   char fpsText[100] = "Debug: 0 ms/frame";
 
+  // Post process
+  Shader ppShader("shader/postpro-vertex.glsl", "shader/postpro-fragment.glsl");
+  ppShader.enable();
+  ppShader.setInt("u_textureCoords", 0);
+
+  VAO ppvao;
+  ppvao.bind();
+  VBO ppvbo(PPVertices);
+  ppvbo.bind();
+  ppvao.linkAttribute(ppvbo, 0, 2, GL_FLOAT, sizeof(glm::vec4), (void*)0);
+  ppvao.linkAttribute(ppvbo, 1, 2, GL_FLOAT, sizeof(glm::vec4),
+                      (void*)(2 * sizeof(float)));
+  ppvao.unbind();
+  ppvbo.unbind();
+
+  GLuint fbo;
+  glGenFramebuffers(1, &fbo);
+  glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+  GLuint frameBufferTexture;
+  glGenTextures(1, &frameBufferTexture);
+  glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WINDOW_WIDTH, WINDOW_HEIGHT, 0, GL_RGB,
+               GL_UNSIGNED_BYTE, NULL);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+                         frameBufferTexture, 0);
+
+  GLuint rbo;
+  glGenRenderbuffers(1, &rbo);
+  glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, WINDOW_WIDTH,
+                        WINDOW_HEIGHT);
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
+                            GL_RENDERBUFFER, rbo);
+
+  auto fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+  if (fboStatus != GL_FRAMEBUFFER_COMPLETE) {
+    std::cerr << "Framebuffer error: " << fboStatus << std::endl;
+  }
+
   while (not window.shouldClose()) {
     glfwPollEvents();
     _handleInput();
@@ -87,6 +144,8 @@ void Engine::run(void) {
       lastTime += 1.0f;
     }
 
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
     glClearColor(_skyColor.x, _skyColor.y, _skyColor.z, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -97,7 +156,17 @@ void Engine::run(void) {
     }
 
     water.render(camera, _lightDirection, _lightColor, fogParams);
-    // skybox.render(camera);
+    skybox.render(camera);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glDisable(GL_DEPTH_TEST);
+    ppShader.enable();
+    ppvao.bind();
+    glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glEnable(GL_DEPTH_TEST);
+
     _displayUI(water, fogParams, fpsText);
 
     window.update();

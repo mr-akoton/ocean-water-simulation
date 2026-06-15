@@ -2,10 +2,12 @@
 #define CUBE_MAP_HPP
 
 #include <glm/glm.hpp>
+#include <stb/stb_image.h>
 
 #include <components/Camera.hpp>
 #include <core/Shader.hpp>
 #include <core/Object.hpp>
+#include <core/Engine.hpp>
 
 #include <vector>
 

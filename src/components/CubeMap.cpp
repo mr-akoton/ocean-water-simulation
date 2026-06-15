@@ -1,15 +1,5 @@
-#include "components/Camera.hpp"
-#include "core/Engine.hpp"
-#include "core/Object.hpp"
-#include "core/Shader.hpp"
-#include "core/Texture.hpp"
-#include "glm/ext/matrix_float4x4.hpp"
-#include "glm/ext/vector_float3.hpp"
-#include "glm/trigonometric.hpp"
 #include <components/CubeMap.hpp>
 #include <iostream>
-#include <ostream>
-#include <vector>
 
 const std::vector<glm::vec3> CubeMap::_vertices{
     {-1.0f, -1.0f, +1.0f}, {+1.0f, -1.0f, +1.0f}, {+1.0f, -1.0f, -1.0f},
@@ -33,11 +23,12 @@ CubeMap::CubeMap(const char* textures[6])
     : _vao(), _vbo(this->_vertices), _ebo(this->_indices),
       shader("shader/skybox-vertex.glsl", "shader/skybox-fragment.glsl") {
   _vao.bind();
-  _vao.linkAttribute(_vbo, 0, 3, GL_FLOAT, sizeof(glm::vec3), (void*)0);
   _ebo.bind();
+  _vao.linkAttribute(_vbo, 0, 3, GL_FLOAT, sizeof(glm::vec3), (void*)0);
+  _vao.unbind();
+  _ebo.unbind();
 
   glGenTextures(1, &texture);
-
   glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -66,9 +57,16 @@ CubeMap::CubeMap(const char* textures[6])
       stbi_image_free(data);
     }
   }
+
+  shader.setInt("u_skybox", 0);
+  glActiveTexture(GL_TEXTURE0);
 }
 
 CubeMap::~CubeMap() {}
+
+/* ========================================================================== */
+/*                                  RENDERER                                  */
+/* ========================================================================== */
 
 void CubeMap::render(Camera& camera) {
   glDepthFunc(GL_LEQUAL);
@@ -86,9 +84,7 @@ void CubeMap::render(Camera& camera) {
 
   shader.setMat4("u_view", view);
   shader.setMat4("u_projection", projection);
-  shader.setInt("u_skybox", 0);
 
-  glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
   glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 

@@ -8,13 +8,14 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <exception>
 #include <components/Camera.hpp>
 #include <components/Interface.hpp>
 #include <components/Water.hpp>
 #include <core/Object.hpp>
 #include <core/Shader.hpp>
 #include <core/Window.hpp>
+
+#include <exception>
 
 constexpr int WINDOW_WIDTH = 1280;
 constexpr int WINDOW_HEIGHT = 720;

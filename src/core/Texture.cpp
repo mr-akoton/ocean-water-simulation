@@ -1,24 +1,11 @@
 #include <core/Texture.hpp>
+#include <core/Engine.hpp>
 
 using namespace glm;
 
 /* ========================================================================== */
 /*                          CONTRUCTOR AND DESTRUCTOR                         */
 /* ========================================================================== */
-
-Texture::Texture(FBO& fbo) {
-  glGenTextures(1, &_id);
-  glBindTexture(GL_TEXTURE_2D, _id);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-               GL_UNSIGNED_BYTE, NULL);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                         _id, 0);
-  (void)fbo;
-}
 
 Texture::Texture(const char* file, GLuint slot, GLenum format, GLenum pixType)
     : _unit(slot) {
