@@ -96,4 +96,4 @@ void CubeMap::render(Camera& camera) {
 
   glEnable(GL_CULL_FACE);
   glDepthFunc(GL_LESS);
-};
+}

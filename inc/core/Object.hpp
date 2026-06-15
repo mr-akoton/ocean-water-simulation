@@ -44,6 +44,7 @@ private:
 public:
   VBO(const std::vector<Vertex>& vertices);
   VBO(const std::vector<glm::vec3>& vertices);
+  VBO(const std::vector<glm::vec4>& vertices);
   ~VBO();
 
   void bind(void) const;
@@ -61,6 +62,38 @@ private:
 public:
   EBO(const std::vector<GLuint>& indices);
   ~EBO();
+
+  void bind(void) const;
+  void unbind(void) const;
+};
+
+/* ========================================================================== */
+/*                             FRAME BUFFER OBJECT                            */
+/* ========================================================================== */
+
+class FBO {
+private:
+  GLuint _id;
+
+public:
+  FBO();
+  ~FBO();
+
+  void bind(void) const;
+  void unbind(void) const;
+};
+
+/* ========================================================================== */
+/*                             RENDER BUFFER OBJECT                           */
+/* ========================================================================== */
+
+class RBO {
+private:
+  GLuint _id;
+
+public:
+  RBO(int width, int height);
+  ~RBO();
 
   void bind(void) const;
   void unbind(void) const;

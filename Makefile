@@ -16,7 +16,7 @@ BUILD_TYPE	?= debug
 CC			:= gcc
 CFLAGS		:= -I $(INC_DIR) -I $(LIB_DIR)
 
-CXX_VERSION	:= -std=c++23
+CXX_VERSION	:= -std=c++17
 CXX = g++
 ifeq ($(BUILD_TYPE), release)
 	CXXFLAGS := -Wall -Wextra -O2 -DNDEBUG $(CXX_VERSION)

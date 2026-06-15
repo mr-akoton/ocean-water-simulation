@@ -12,6 +12,7 @@
 #include <glm/gtx/transform.hpp>
 
 #include <components/Camera.hpp>
+#include <components/VisualEffects.hpp>
 #include <core/Object.hpp>
 #include <core/Shader.hpp>
 
@@ -37,6 +38,7 @@ public:
   float iterationMult;
 
   glm::vec3 position;
+  glm::vec3 color;
   glm::mat4 model;
   Shader shader;
 
@@ -50,9 +52,9 @@ public:
         glm::vec3 position = glm::vec3(0.0f));
   ~Water();
 
-  void init(glm::vec3 color);
-  void render(Camera& camera, glm::vec3 lightDirection,
-              glm::vec3 lightColor) const;
+  void init();
+  void render(Camera& camera, const glm::vec3 lightDirection,
+              const glm::vec3 lightColor, const Fog fogParam) const;
 };
 
 #endif

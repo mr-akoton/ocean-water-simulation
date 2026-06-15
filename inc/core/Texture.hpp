@@ -1,6 +1,7 @@
 #ifndef TEXTURE_HPP
 #define TEXTURE_HPP
 
+#include "Object.hpp"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -23,6 +24,7 @@ private:
   GLuint _unit;
 
 public:
+  Texture(FBO& fbo);
   Texture(const char* file, GLuint slot, GLenum format, GLenum pixType);
   ~Texture();
 

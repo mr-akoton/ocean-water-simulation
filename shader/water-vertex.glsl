@@ -6,6 +6,7 @@ layout(location = 1) in vec3 in_color;
 #define PI 3.14159265359
 
 uniform mat4 u_projection;
+uniform vec3 u_color;
 uniform mat4 u_model;
 uniform mat3 u_imodel;
 uniform float u_time;
@@ -102,6 +103,6 @@ void main() {
 
     gl_Position = u_projection * worldPosition;
     p_fragPosition = worldPosition.xyz;
-    p_color = in_color;
+    p_color = u_color;
     p_normal = normalize(u_imodel * normal);
 }

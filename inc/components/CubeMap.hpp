@@ -1,8 +1,12 @@
-#include "components/Camera.hpp"
-#include "core/Shader.hpp"
-#include "glm/ext/vector_float3.hpp"
-#include "glm/fwd.hpp"
+#ifndef CUBE_MAP_HPP
+#define CUBE_MAP_HPP
+
+#include <glm/glm.hpp>
+
+#include <components/Camera.hpp>
+#include <core/Shader.hpp>
 #include <core/Object.hpp>
+
 #include <vector>
 
 class CubeMap {
@@ -24,3 +28,5 @@ public:
 
   void render(Camera& camera);
 };
+
+#endif

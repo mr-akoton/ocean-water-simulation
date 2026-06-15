@@ -30,6 +30,10 @@ public:
   Interface interface;
 
 private:
+  glm::vec3 _skyColor;
+  glm::vec3 _lightDirection;
+  glm::vec3 _lightColor;
+
   float _lastFrame;
   float _deltaTime;
   unsigned int _frameCount;
@@ -45,6 +49,7 @@ private:
   void _initGLAD(void) const;
   void _handleInput(void) const;
   void _updateDeltaTime(void);
+  void _displayUI(Water& water, Fog& fog, char* fpsText);
 
 public:
   class WindowInitFailedException : std::exception {
