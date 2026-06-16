@@ -9,6 +9,8 @@
 #include <GLFW/glfw3.h>
 
 #include <components/Camera.hpp>
+#include <components/CubeMap.hpp>
+#include <components/VisualEffects.hpp>
 #include <components/Interface.hpp>
 #include <components/Water.hpp>
 #include <core/Object.hpp>
@@ -16,13 +18,6 @@
 #include <core/Window.hpp>
 
 #include <exception>
-
-constexpr int WINDOW_WIDTH = 1280;
-constexpr int WINDOW_HEIGHT = 720;
-constexpr const char* WINDOW_TITLE = "OpenGL - Water";
-constexpr const char* SKYBOX_FACES[6] = {
-    "resources/right.jpg",  "resources/left.jpg",  "resources/top.jpg",
-    "resources/bottom.jpg", "resources/front.jpg", "resources/back.jpg"};
 
 class Engine {
 public:
@@ -50,7 +45,7 @@ private:
   void _initGLAD(void) const;
   void _handleInput(void) const;
   void _updateDeltaTime(void);
-  void _displayUI(Water& water, Fog& fog, char* fpsText);
+  void _displayUI(Water& water, Fog& fog, CubeMap& skybox, char* fpsText);
 
 public:
   class WindowInitFailedException : std::exception {

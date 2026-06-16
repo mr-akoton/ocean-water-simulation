@@ -2,5 +2,6 @@
 .cache
 draft.tldr
 
+obj
 *.o
 water-simulation

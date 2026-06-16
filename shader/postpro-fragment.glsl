@@ -1,5 +1,6 @@
 #version 330 core
 
+uniform vec3 u_viewPosition;
 uniform sampler2D u_colorTexture;
 uniform sampler2D u_depthTexture;
 

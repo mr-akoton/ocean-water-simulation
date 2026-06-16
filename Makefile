@@ -7,6 +7,7 @@ SRC_DIR		:= ./src
 INC_DIR		:= ./inc
 LIB_DIR		:= ./lib
 EXT_DIR		:= ./ext
+OBJ_DIR		:= ./obj
 
 BUILD_TYPE	?= debug
 
@@ -33,8 +34,10 @@ RM			:= rm -rf
 
 # ---------------------------------- C Files --------------------------------- #
 
+
 SRC_C		:= $(EXT_DIR)/glad/glad.c
-OBJ_C		:= $(SRC_C:.c=.o)
+OBJ_C   	:= $(addprefix $(OBJ_DIR)/, $(patsubst ./%,%,$(SRC_C:.c=.o)))
+# OBJ_C		:= $(SRC_C:.c=.o)
 
 # --------------------------------- C++ Files -------------------------------- #
 
@@ -64,7 +67,8 @@ SRC_FILE	:= components/Camera.cpp \
 
 SRC_CXX		:= $(addprefix $(EXT_DIR)/, $(EXT_FILE)) \
 			   $(addprefix $(SRC_DIR)/, $(SRC_FILE))
-OBJ_CXX		:= $(SRC_CXX:.cpp=.o)
+# OBJ_CXX		:= $(SRC_CXX:.cpp=.o)
+OBJ_CXX 	:= $(addprefix $(OBJ_DIR)/, $(patsubst ./%,%,$(SRC_CXX:.cpp=.o)))
 
 # ------------------------------- Final Object ------------------------------- #
 
@@ -72,6 +76,14 @@ OBJ			:= $(OBJ_C) $(OBJ_CXX)
 
 # ============================================================================ #
 # RULES
+
+$(OBJ_DIR)/%.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR)/%.o: %.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 all: $(NAME)
 
@@ -82,7 +94,7 @@ run: all
 	@./$(NAME)
 
 clean:
-	$(RM) $(OBJ)
+	$(RM) $(OBJ_DIR)
 
 fclean: clean
 	$(RM) $(NAME)

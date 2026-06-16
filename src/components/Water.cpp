@@ -12,10 +12,11 @@ using namespace glm;
 Water::Water(unsigned int width, unsigned int height, float gridSize,
              vec3 position)
     : width(width), height(height), gridSize(gridSize), iteration(32),
-      amplitude(13.0), frequency(0.02), speed(2.0), drag(1.4), peakMax(1.0),
+      amplitude(8.0), frequency(0.02), speed(1.4), drag(1.4), peakMax(1.0),
       peakOffset(1.0), amplitudeMult(0.82), frequencyMult(1.18),
-      speedMult(1.07), iterationMult(1232.399963), position(position),
-      color(0.172f, 0.3412f, 0.4667f), model(1.0f),
+      speedMult(1.07), iterationMult(1.18), ambienColor(1.0f),
+      ambientStrength(0.4), specularStrength(1.0), shininess(256),
+      position(position), color(0.629f, 0.883f, 0.917f), model(1.0f),
       shader(VERTEX_SHADER, FRAGMENT_SHADER) {
   model = translate(model, position);
 }
@@ -31,7 +32,7 @@ void Water::init() {
     for (unsigned int x = 0; x < width; x++) {
       Vertex vertex;
       vertex.position = vec3((float)x * gridSize, 0.0f, (float)z * gridSize);
-      vertex.color = vec3(0.172f, 0.3412f, 0.4667f);
+      vertex.color = vec3(1.0f);
       _vertices.push_back(vertex);
 
       if (x != width - 1 and z != height - 1) {
@@ -68,7 +69,7 @@ void Water::init() {
 /* ========================================================================== */
 
 void Water::render(Camera& camera, const vec3 lightDirection,
-                   const vec3 lightColor, const Fog fogParam) const {
+                   const vec3 lightColor) const {
   _vao.bind();
 
   shader.enable();
@@ -79,12 +80,6 @@ void Water::render(Camera& camera, const vec3 lightDirection,
   shader.setVec3("u_lightDirection", lightDirection);
   shader.setVec3("u_lightColor", lightColor);
   shader.setVec3("u_viewPosition", camera.position);
-
-  shader.setVec3("u_fogColor", fogParam.color);
-  shader.setFloat("u_fogNear", fogParam.near);
-  shader.setFloat("u_fogFar", fogParam.far);
-  shader.setFloat("u_fogSteepness", fogParam.steepnees);
-  shader.setFloat("u_fogOffset", fogParam.offset);
 
   shader.setInt("u_waveIteration", iteration);
   shader.setFloat("u_amplitude", amplitude);
@@ -98,6 +93,11 @@ void Water::render(Camera& camera, const vec3 lightDirection,
   shader.setFloat("u_frequencyMult", frequencyMult);
   shader.setFloat("u_speedMult", speedMult);
   shader.setFloat("u_iterationMult", iterationMult);
+
+  shader.setFloat("u_ambientStrength", ambientStrength);
+  shader.setVec3("u_ambientColor", ambienColor);
+  shader.setFloat("u_specularStrength", specularStrength);
+  shader.setInt("u_shininess", shininess);
 
   shader.setFloat("u_time", glfwGetTime());
 

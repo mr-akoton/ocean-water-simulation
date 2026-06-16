@@ -1,4 +1,5 @@
 #include <components/CubeMap.hpp>
+#include <settings.hpp>
 #include <iostream>
 
 const std::vector<glm::vec3> CubeMap::_vertices{
@@ -20,7 +21,8 @@ const std::vector<GLuint> CubeMap::_indices{
 /* ========================================================================== */
 
 CubeMap::CubeMap(const char* textures[6])
-    : _vao(), _vbo(this->_vertices), _ebo(this->_indices),
+    : _vao(), _vbo(this->_vertices), _ebo(this->_indices), sunSize(0.999),
+      sunBrightness(1.5),
       shader("shader/skybox-vertex.glsl", "shader/skybox-fragment.glsl") {
   _vao.bind();
   _ebo.bind();
@@ -68,7 +70,8 @@ CubeMap::~CubeMap() {}
 /*                                  RENDERER                                  */
 /* ========================================================================== */
 
-void CubeMap::render(Camera& camera) {
+void CubeMap::render(Camera& camera, const glm::vec3 lightDirection,
+                     const glm::vec3 lightColor, const glm::vec3 skyColor) {
   glDepthFunc(GL_LEQUAL);
   glDisable(GL_CULL_FACE);
 
@@ -84,6 +87,14 @@ void CubeMap::render(Camera& camera) {
 
   shader.setMat4("u_view", view);
   shader.setMat4("u_projection", projection);
+
+  shader.setVec3("u_skyColor", skyColor);
+  shader.setVec3("u_viewPosition", camera.position);
+  shader.setVec3("u_lightDirection", lightDirection);
+  shader.setVec3("u_lightColor", lightColor);
+
+  shader.setFloat("u_sunSize", sunSize);
+  shader.setFloat("u_sunBrightness", sunBrightness);
 
   glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
   glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);

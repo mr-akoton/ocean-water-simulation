@@ -1,4 +1,5 @@
 #include <components/PostProcessFrame.hpp>
+#include <settings.hpp>
 #include <iostream>
 
 const std::vector<glm::vec4> PostProcessFrame::_vertices{

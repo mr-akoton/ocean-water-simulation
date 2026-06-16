@@ -7,7 +7,6 @@
 #include <components/Camera.hpp>
 #include <core/Shader.hpp>
 #include <core/Object.hpp>
-#include <core/Engine.hpp>
 
 #include <vector>
 
@@ -21,6 +20,8 @@ private:
   EBO _ebo;
 
 public:
+  float sunSize;
+  float sunBrightness;
   GLuint texture;
   Shader shader;
 
@@ -28,7 +29,8 @@ public:
   CubeMap(const char* textures[6]);
   ~CubeMap();
 
-  void render(Camera& camera);
+  void render(Camera& camera, const glm::vec3 lightDirection,
+              const glm::vec3 lightColor, const glm::vec3 skyColor);
 };
 
 #endif

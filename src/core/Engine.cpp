@@ -1,11 +1,5 @@
-#include "components/Camera.hpp"
-#include "components/Water.hpp"
-#include "core/Object.hpp"
-#include "core/Shader.hpp"
-#include "glm/gtc/type_ptr.hpp"
-#include "imgui/imgui.h"
 #include <core/Engine.hpp>
-#include <components/CubeMap.hpp>
+#include <settings.hpp>
 #include <iostream>
 
 using namespace glm;
@@ -16,8 +10,8 @@ using namespace glm;
 
 Engine::Engine(void)
     : camera(WINDOW_WIDTH, WINDOW_HEIGHT, vec3(250.0f, 150.0f, -100.0f)),
-      _skyColor(0.5f), _lightDirection(-0.2f, -0.8f, -1.0f),
-      _lightColor(1.0f, 1.0f, 1.0f), _lastFrame(0.0f), _deltaTime(0.0f),
+      _skyColor(0.0f), _lightDirection(-0.2f, -0.5f, -1.0f),
+      _lightColor(0.769f, 0.775f, 0.680f), _lastFrame(0.0f), _deltaTime(0.0f),
       _frameCount(0) {
   _initGLFW();
   if (window.init(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE) == -1) {
@@ -77,7 +71,7 @@ void Engine::run(void) {
   water.init();
 
   Fog fogParams;
-  fogParams.color = vec3(1.0f);
+  fogParams.color = vec3(0.769f, 0.775f, 0.680f);
   fogParams.near = 0.1f;
   fogParams.far = 1000.0f;
   fogParams.steepnees = 0.005f;
@@ -160,8 +154,8 @@ void Engine::run(void) {
       camera.handleInput(window, _deltaTime);
     }
 
-    water.render(camera, _lightDirection, _lightColor, fogParams);
-    skybox.render(camera);
+    water.render(camera, _lightDirection, _lightColor);
+    skybox.render(camera, _lightDirection, _lightColor, _skyColor);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -173,6 +167,7 @@ void Engine::run(void) {
     ppShader.setFloat("u_far", fogParams.far);
     ppShader.setFloat("u_steepness", fogParams.steepnees);
     ppShader.setFloat("u_offset", fogParams.offset);
+    ppShader.setVec3("u_viewPosition", camera.position);
 
     glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
     glBindTexture(GL_TEXTURE_2D, depthTexture);
@@ -180,7 +175,7 @@ void Engine::run(void) {
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glEnable(GL_DEPTH_TEST);
 
-    _displayUI(water, fogParams, fpsText);
+    _displayUI(water, fogParams, skybox, fpsText);
 
     window.update();
   }
@@ -196,38 +191,68 @@ void Engine::_handleInput(void) const {
   }
 }
 
-void Engine::_displayUI(Water& water, Fog& fog, char* fpsText) {
+void Engine::_displayUI(Water& water, Fog& fog, CubeMap& skybox,
+                        char* fpsText) {
   interface.createFrame();
   ImGui::Begin("Setting");
 
-  ImGui::Text("%s", fpsText);
+  ImGui::TextUnformatted(fpsText);
+  ImGui::Separator();
 
-  ImGui::Text("Water");
-  ImGui::ColorEdit3("Water Color", value_ptr(water.color));
-  ImGui::InputInt("Iteration", &water.iteration);
-  ImGui::InputFloat("Amplitude", &water.amplitude);
-  ImGui::InputFloat("Frequence", &water.frequency);
-  ImGui::SliderFloat("Speed", &water.speed, 0.0, 10.0, "%.2f");
-  ImGui::SliderFloat("Drag", &water.drag, -10.0, 10.0, "%.2f");
-  ImGui::InputFloat("Peak Max", &water.peakMax);
-  ImGui::InputFloat("Peak Offset", &water.peakOffset);
+  if (ImGui::CollapsingHeader("Water", ImGuiTreeNodeFlags_DefaultOpen)) {
+    ImGui::ColorEdit3("Color", value_ptr(water.color));
 
-  ImGui::InputFloat("Amplitude Multiplier", &water.amplitudeMult);
-  ImGui::InputFloat("Frequency Multiplier", &water.frequencyMult);
-  ImGui::InputFloat("Speed Multiplier", &water.speedMult);
-  ImGui::InputFloat("Iteration Multiplier", &water.iterationMult);
+    ImGui::DragInt("Iterations", &water.iteration, 0.1f, 1, 100);
 
-  ImGui::Text("Light");
-  ImGui::ColorEdit3("Sky Color", value_ptr(_skyColor));
-  ImGui::ColorEdit3("Light Color", value_ptr(_lightColor));
-  ImGui::SliderFloat3("Direction", value_ptr(_lightDirection), -1, 1, "%.3f");
+    ImGui::SliderFloat("Amplitude", &water.amplitude, 0.0f, 20.0f, "%.0f");
+    ImGui::SliderFloat("Frequency", &water.frequency, 0.0f, 1.0f, "%.3f");
+    ImGui::SliderFloat("Speed", &water.speed, 0.0f, 10.0f, "%.2f");
+    ImGui::SliderFloat("Drag", &water.drag, 0.0f, 5.0f, "%.2f");
 
-  ImGui::Text("Fog");
-  ImGui::ColorEdit3("Fog Color", value_ptr(fog.color));
-  ImGui::InputFloat("Near", &fog.near);
-  ImGui::InputFloat("Far", &fog.far);
-  ImGui::InputFloat("Steepness", &fog.steepnees);
-  ImGui::InputFloat("Offset", &fog.offset);
+    ImGui::SeparatorText("Wave Shaping");
+    ImGui::InputFloat("Peak Max", &water.peakMax);
+    ImGui::InputFloat("Peak Offset", &water.peakOffset);
+
+    ImGui::SeparatorText("Multipliers");
+    ImGui::DragFloat("Amplitude Mult", &water.amplitudeMult, 0.01f, 0.0f,
+                     10.0f);
+    ImGui::DragFloat("Frequency Mult", &water.frequencyMult, 0.01f, 0.0f,
+                     10.0f);
+    ImGui::DragFloat("Speed Mult", &water.speedMult, 0.01f, 0.0f, 10.0f);
+    ImGui::DragFloat("Iteration Mult", &water.iterationMult, 0.01f, 0.0f,
+                     10.0f);
+
+    ImGui::SeparatorText("Materials");
+    ImGui::ColorEdit3("Ambient Color", value_ptr(water.ambienColor));
+    ImGui::SliderFloat("Ambient Strength", &water.ambientStrength, 0.0f, 1.0f,
+                       "%.2f");
+    ImGui::SliderFloat("Specular Strength", &water.specularStrength, 0.0f, 1.0f,
+                       "%.2f");
+    ImGui::InputInt("Shininess", &water.shininess);
+  }
+
+  if (ImGui::CollapsingHeader("Lighting")) {
+    ImGui::ColorEdit3("Sky Color", value_ptr(_skyColor));
+    ImGui::ColorEdit3("Light Color", value_ptr(_lightColor));
+
+    ImGui::SliderFloat3("Direction", value_ptr(_lightDirection), -1.0f, 1.0f);
+
+    ImGui::Separator();
+
+    ImGui::DragFloat("Sun Size", &skybox.sunSize, 0.01f, 0.0f, 100.0f);
+    ImGui::DragFloat("Sun Brightness", &skybox.sunBrightness, 0.01f, 0.0f,
+                     10.0f);
+  }
+
+  if (ImGui::CollapsingHeader("Fog")) {
+    ImGui::ColorEdit3("Fog Color", value_ptr(fog.color));
+
+    ImGui::DragFloat("Fog Near", &fog.near, 0.1f, 0.0f, 1000.0f);
+    ImGui::DragFloat("Fog Far", &fog.far, 0.1f, 0.0f, 5000.0f);
+
+    ImGui::InputFloat("Fog Steepness", &fog.steepnees);
+    ImGui::InputFloat("Fog Offset", &fog.offset);
+  }
 
   ImGui::End();
   interface.render();

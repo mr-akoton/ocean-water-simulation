@@ -12,7 +12,6 @@
 #include <glm/gtx/transform.hpp>
 
 #include <components/Camera.hpp>
-#include <components/VisualEffects.hpp>
 #include <core/Object.hpp>
 #include <core/Shader.hpp>
 
@@ -37,6 +36,11 @@ public:
   float speedMult;
   float iterationMult;
 
+  glm::vec3 ambienColor;
+  float ambientStrength;
+  float specularStrength;
+  int shininess;
+
   glm::vec3 position;
   glm::vec3 color;
   glm::mat4 model;
@@ -56,7 +60,7 @@ public:
 
   void init();
   void render(Camera& camera, const glm::vec3 lightDirection,
-              const glm::vec3 lightColor, const Fog fogParam) const;
+              const glm::vec3 lightColor) const;
 };
 
 #endif
