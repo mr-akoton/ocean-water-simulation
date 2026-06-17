@@ -68,8 +68,7 @@ void Water::init() {
 /*                                   UPDATE                                   */
 /* ========================================================================== */
 
-void Water::render(Camera& camera, const vec3 lightDirection,
-                   const vec3 lightColor) const {
+void Water::render(Camera& camera, Environment& environment) const {
   _vao.bind();
 
   shader.enable();
@@ -77,8 +76,8 @@ void Water::render(Camera& camera, const vec3 lightDirection,
   shader.setVec3("u_color", color);
   shader.setMat4("u_model", model);
   shader.setMat3("u_imodel", transpose(inverse(mat3(model))));
-  shader.setVec3("u_lightDirection", lightDirection);
-  shader.setVec3("u_lightColor", lightColor);
+  shader.setVec3("u_lightDirection", environment.lightDirection);
+  shader.setVec3("u_lightColor", environment.lightColor);
   shader.setVec3("u_viewPosition", camera.position);
 
   shader.setInt("u_waveIteration", iteration);

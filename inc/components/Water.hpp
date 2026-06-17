@@ -12,6 +12,7 @@
 #include <glm/gtx/transform.hpp>
 
 #include <components/Camera.hpp>
+#include <components/Environment.hpp>
 #include <core/Object.hpp>
 #include <core/Shader.hpp>
 
@@ -59,8 +60,7 @@ public:
   ~Water();
 
   void init();
-  void render(Camera& camera, const glm::vec3 lightDirection,
-              const glm::vec3 lightColor) const;
+  void render(Camera& camera, Environment& environment) const;
 };
 
 #endif

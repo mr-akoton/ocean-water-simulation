@@ -1,4 +1,5 @@
 #include <components/Environment.hpp>
+#include <components/CubeMap.hpp>
 #include <settings.hpp>
 #include <iostream>
 
@@ -17,8 +18,8 @@ const std::vector<glm::vec4> Environment::_vertices{
 
 Environment::Environment(void)
     : shader("shader/postpro-vertex.glsl", "shader/postpro-fragment.glsl"),
-      skybox((const char**)SKYBOX_FACES), lightDirection(-0.2f, -0.2f, -1.0f),
-      lightColor(1.0f) {
+      skybox((const char**)SKYBOX_FACES), skyColor(0.0f),
+      lightDirection(-0.2f, -0.2f, -1.0f), lightColor(1.0f) {
   shader.enable();
   shader.setInt("u_colorTexture", 0);
   shader.setInt("u_depthTexture", 1);

@@ -9,9 +9,7 @@ using namespace glm;
 
 Engine::Engine(void)
     : camera(WINDOW_WIDTH, WINDOW_HEIGHT, vec3(250.0f, 150.0f, -100.0f)),
-      _skyColor(0.0f), _lightDirection(-0.2f, -0.5f, -1.0f),
-      _lightColor(0.769f, 0.775f, 0.680f), _lastFrame(0.0f), _deltaTime(0.0f),
-      _frameCount(0) {
+      _isUIEnable(false), _lastFrame(0.0f), _deltaTime(0.0f), _frameCount(0) {
   _initGLFW();
   if (window.init(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE) == -1) {
     glfwTerminate();
@@ -62,6 +60,7 @@ void Engine::run(void) {
 
   Environment environment;
   CubeMap& skybox = environment.skybox;
+  vec3 skyColor = environment.skyColor;
 
   float lastTime = glfwGetTime();
   char fpsText[100] = "Debug: 0 ms/frame";
@@ -79,7 +78,7 @@ void Engine::run(void) {
     }
 
     environment.attach();
-    glClearColor(_skyColor.x, _skyColor.y, _skyColor.z, 1.0f);
+    glClearColor(skyColor.x, skyColor.y, skyColor.z, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     camera.updateMatrix(CAMERA_FOV, CAMERA_NEAR, CAMERA_FAR);
 
@@ -87,14 +86,15 @@ void Engine::run(void) {
       camera.handleInput(window, _deltaTime);
     }
 
-    water.render(camera, environment.lightDirection, environment.lightColor);
-    skybox.render(camera, environment.lightDirection, environment.lightColor,
-                  _skyColor);
+    water.render(camera, environment);
+    skybox.render(camera, environment);
 
     environment.detach();
     environment.render(camera);
 
-    _displayUI(water, environment, fpsText);
+    if (_isUIEnable) {
+      _displayUI(water, environment, fpsText);
+    }
     window.update();
   }
 }
@@ -103,9 +103,13 @@ void Engine::run(void) {
 /*                                    INPUT                                   */
 /* ========================================================================== */
 
-void Engine::_handleInput(void) const {
+void Engine::_handleInput(void) {
   if (window.isKeyPressed(GLFW_KEY_ESCAPE)) {
     window.close();
+  }
+
+  if (window.isKeyJustPressed(GLFW_KEY_T)) {
+    _isUIEnable = not _isUIEnable;
   }
 }
 
@@ -149,7 +153,7 @@ void Engine::_displayUI(Water& water, Environment& environment, char* fpsText) {
   }
 
   if (ImGui::CollapsingHeader("Lighting")) {
-    ImGui::ColorEdit3("Sky Color", value_ptr(_skyColor));
+    ImGui::ColorEdit3("Sky Color", value_ptr(environment.skyColor));
     ImGui::ColorEdit3("Light Color", value_ptr(environment.lightColor));
     ImGui::SliderFloat3("Direction", value_ptr(environment.lightDirection),
                         -1.0f, 1.0f);

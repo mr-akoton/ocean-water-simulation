@@ -5,12 +5,15 @@
 #include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
+#include <components/Camera.hpp>
+#include <components/CubeMap.hpp>
 #include <core/Object.hpp>
 #include <core/Texture.hpp>
-#include <components/CubeMap.hpp>
 #include <effects/Fog.hpp>
 
 #include <vector>
+
+class CubeMap;
 
 class Environment {
 private:
@@ -27,6 +30,7 @@ public:
 
   Fog fog;
   CubeMap skybox;
+  glm::vec3 skyColor;
   glm::vec3 lightDirection;
   glm::vec3 lightColor;
 

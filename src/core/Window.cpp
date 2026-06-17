@@ -22,12 +22,56 @@ bool Window::isKeyPressed(int key) const {
   return _isInit and glfwGetKey(_id, key) == GLFW_PRESS;
 }
 
+bool Window::isKeyJustPressed(int key) {
+  if (not _isInit) {
+    return false;
+  }
+
+  bool current = glfwGetKey(_id, key) == GLFW_PRESS;
+  bool previous = _previousKeys[key];
+  _previousKeys[key] = current;
+  return current and not previous;
+}
+
+bool Window::isKeyJustReleased(int key) {
+  if (not _isInit) {
+    return false;
+  }
+
+  bool current = glfwGetKey(_id, key) == GLFW_PRESS;
+  bool previous = _previousKeys[key];
+  _previousKeys[key] = current;
+  return not current and previous;
+}
+
 bool Window::isKeyReleased(int key) const {
   return _isInit and glfwGetKey(_id, key) == GLFW_RELEASE;
 }
 
 bool Window::isButtonPressed(int button) const {
   return _isInit and glfwGetMouseButton(_id, button) == GLFW_PRESS;
+}
+
+bool Window::isButtonJustPressed(int button) {
+  if (not _isInit) {
+    return false;
+  }
+
+  bool current = glfwGetMouseButton(_id, button) == GLFW_PRESS;
+  bool previous = _previousButtons[button];
+  _previousButtons[button] = current;
+  return current and not previous;
+}
+
+bool Window::isButtonJustReleased(int button) {
+  if (not _isInit) {
+    return false;
+  }
+
+  bool current = glfwGetMouseButton(_id, button) == GLFW_PRESS;
+  bool previous = _previousButtons[button];
+  _previousButtons[button] = current;
+  return not current and previous;
 }
 
 bool Window::isButtonReleased(int button) const {

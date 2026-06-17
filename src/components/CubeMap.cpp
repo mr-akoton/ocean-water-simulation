@@ -1,4 +1,5 @@
 #include <components/CubeMap.hpp>
+#include <components/Environment.hpp>
 #include <settings.hpp>
 #include <iostream>
 
@@ -70,8 +71,7 @@ CubeMap::~CubeMap() {}
 /*                                  RENDERER                                  */
 /* ========================================================================== */
 
-void CubeMap::render(Camera& camera, const glm::vec3 lightDirection,
-                     const glm::vec3 lightColor, const glm::vec3 skyColor) {
+void CubeMap::render(Camera& camera, Environment& environment) {
   glDepthFunc(GL_LEQUAL);
   glDisable(GL_CULL_FACE);
 
@@ -88,10 +88,10 @@ void CubeMap::render(Camera& camera, const glm::vec3 lightDirection,
   shader.setMat4("u_view", view);
   shader.setMat4("u_projection", projection);
 
-  shader.setVec3("u_skyColor", skyColor);
   shader.setVec3("u_viewPosition", camera.position);
-  shader.setVec3("u_lightDirection", lightDirection);
-  shader.setVec3("u_lightColor", lightColor);
+  shader.setVec3("u_skyColor", environment.skyColor);
+  shader.setVec3("u_lightDirection", environment.lightDirection);
+  shader.setVec3("u_lightColor", environment.lightColor);
 
   shader.setFloat("u_sunSize", sunSize);
   shader.setFloat("u_sunBrightness", sunBrightness);

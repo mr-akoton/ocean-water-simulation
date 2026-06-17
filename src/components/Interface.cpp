@@ -19,6 +19,7 @@ void Interface::init(Window& window) {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   io = &ImGui::GetIO();
+  io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;
   ImGui::StyleColorsDark();
   this->window->initImGui();
   ImGui_ImplOpenGL3_Init("#version 330");
@@ -39,6 +40,8 @@ void Interface::createFrame(void) const {
   ImGui_ImplGlfw_NewFrame();
   ImGui_ImplOpenGL3_NewFrame();
   ImGui::NewFrame();
+  ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(),
+                               ImGuiDockNodeFlags_PassthruCentralNode);
 }
 
 /* ========================================================================== */

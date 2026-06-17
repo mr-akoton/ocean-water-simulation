@@ -9,10 +9,8 @@
 #include <GLFW/glfw3.h>
 
 #include <components/Camera.hpp>
-#include <components/CubeMap.hpp>
 #include <components/Interface.hpp>
 #include <components/Water.hpp>
-#include <components/Environment.hpp>
 #include <core/Object.hpp>
 #include <core/Shader.hpp>
 #include <core/Window.hpp>
@@ -27,10 +25,7 @@ public:
   Interface interface;
 
 private:
-  glm::vec3 _skyColor;
-  glm::vec3 _lightDirection;
-  glm::vec3 _lightColor;
-
+  bool _isUIEnable;
   float _lastFrame;
   float _deltaTime;
   unsigned int _frameCount;
@@ -44,7 +39,7 @@ public:
 private:
   void _initGLFW(void) const;
   void _initGLAD(void) const;
-  void _handleInput(void) const;
+  void _handleInput(void);
   void _updateDeltaTime(void);
   void _displayUI(Water& water, Environment& environment, char* fpsText);
 

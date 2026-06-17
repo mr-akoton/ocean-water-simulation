@@ -10,6 +10,8 @@
 
 #include <vector>
 
+class Environment;
+
 class CubeMap {
 private:
   static const std::vector<glm::vec3> _vertices;
@@ -22,6 +24,7 @@ private:
 public:
   float sunSize;
   float sunBrightness;
+
   GLuint texture;
   Shader shader;
 
@@ -29,8 +32,7 @@ public:
   CubeMap(const char* textures[6]);
   ~CubeMap();
 
-  void render(Camera& camera, const glm::vec3 lightDirection,
-              const glm::vec3 lightColor, const glm::vec3 skyColor);
+  void render(Camera& camera, Environment& environment);
 };
 
 #endif
