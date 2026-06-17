@@ -236,7 +236,7 @@
     "output": "src/components/Interface.o"
   },
   {
-    "file": "src/components/PostProcessFrame.cpp",
+    "file": "src/components/Environment.cpp",
     "arguments": [
       "/usr/bin/g++",
       "-Wall",
@@ -251,11 +251,11 @@
       "./lib",
       "-c",
       "-o",
-      "src/components/PostProcessFrame.o",
-      "src/components/PostProcessFrame.cpp"
+      "src/components/Environment.o",
+      "src/components/Environment.cpp"
     ],
     "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
-    "output": "src/components/PostProcessFrame.o"
+    "output": "src/components/Environment.o"
   },
   {
     "file": "src/components/Water.cpp",
@@ -476,6 +476,28 @@
     ],
     "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
     "output": "src/core/Window.o"
+  },
+  {
+    "file": "src/effects/Fog.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-O0",
+      "-g",
+      "-std=c++17",
+      "-I",
+      "./inc",
+      "-I",
+      "./lib",
+      "-c",
+      "-o",
+      "src/effects/Fog.o",
+      "src/effects/Fog.cpp"
+    ],
+    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
+    "output": "src/effects/Fog.o"
   },
   {
     "file": "src/main.cpp",

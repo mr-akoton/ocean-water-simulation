@@ -1,6 +1,5 @@
 #include <core/Engine.hpp>
 #include <settings.hpp>
-#include <iostream>
 
 using namespace glm;
 
@@ -70,66 +69,11 @@ void Engine::run(void) {
   Water water(1000, 1000);
   water.init();
 
-  Fog fogParams;
-  fogParams.color = vec3(0.769f, 0.775f, 0.680f);
-  fogParams.near = 0.1f;
-  fogParams.far = 1000.0f;
-  fogParams.steepnees = 0.005f;
-  fogParams.offset = 500.0f;
-
-  CubeMap skybox((const char**)SKYBOX_FACES);
+  Environment environment;
+  CubeMap& skybox = environment.skybox;
 
   float lastTime = glfwGetTime();
   char fpsText[100] = "Debug: 0 ms/frame";
-
-  // Post process
-  Shader ppShader("shader/postpro-vertex.glsl", "shader/postpro-fragment.glsl");
-  ppShader.enable();
-  ppShader.setInt("u_colorTexture", 0);
-  ppShader.setInt("u_depthTexture", 1);
-
-  VAO ppvao;
-  ppvao.bind();
-  VBO ppvbo(PPVertices);
-  ppvbo.bind();
-  ppvao.linkAttribute(ppvbo, 0, 2, GL_FLOAT, sizeof(glm::vec4), (void*)0);
-  ppvao.linkAttribute(ppvbo, 1, 2, GL_FLOAT, sizeof(glm::vec4),
-                      (void*)(2 * sizeof(float)));
-  ppvao.unbind();
-  ppvbo.unbind();
-
-  GLuint fbo;
-  glGenFramebuffers(1, &fbo);
-  glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
-  GLuint frameBufferTexture;
-  glActiveTexture(GL_TEXTURE0);
-  glGenTextures(1, &frameBufferTexture);
-  glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WINDOW_WIDTH, WINDOW_HEIGHT, 0, GL_RGB,
-               GL_UNSIGNED_BYTE, NULL);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                         frameBufferTexture, 0);
-
-  GLuint depthTexture;
-  glActiveTexture(GL_TEXTURE1);
-  glGenTextures(1, &depthTexture);
-  glBindTexture(GL_TEXTURE_2D, depthTexture);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, WINDOW_WIDTH,
-               WINDOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
-                         depthTexture, 0);
-
-  auto fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-  if (fboStatus != GL_FRAMEBUFFER_COMPLETE) {
-    std::cerr << "Framebuffer error: " << fboStatus << std::endl;
-  }
 
   while (not window.shouldClose()) {
     glfwPollEvents();
@@ -143,40 +87,23 @@ void Engine::run(void) {
       lastTime += 1.0f;
     }
 
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
+    environment.attach();
     glClearColor(_skyColor.x, _skyColor.y, _skyColor.z, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     camera.updateMatrix(45.0f, 0.1f, 2000.f);
 
     if (not interface.wantCaptureMouse()) {
       camera.handleInput(window, _deltaTime);
     }
 
-    water.render(camera, _lightDirection, _lightColor);
-    skybox.render(camera, _lightDirection, _lightColor, _skyColor);
+    water.render(camera, environment.lightDirection, environment.lightColor);
+    skybox.render(camera, environment.lightDirection, environment.lightColor,
+                  _skyColor);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    environment.detach();
+    environment.render(camera);
 
-    glDisable(GL_DEPTH_TEST);
-    ppvao.bind();
-    ppShader.enable();
-    ppShader.setVec3("u_fogColor", fogParams.color);
-    ppShader.setFloat("u_near", fogParams.near);
-    ppShader.setFloat("u_far", fogParams.far);
-    ppShader.setFloat("u_steepness", fogParams.steepnees);
-    ppShader.setFloat("u_offset", fogParams.offset);
-    ppShader.setVec3("u_viewPosition", camera.position);
-
-    glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
-    glBindTexture(GL_TEXTURE_2D, depthTexture);
-
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    glEnable(GL_DEPTH_TEST);
-
-    _displayUI(water, fogParams, skybox, fpsText);
-
+    _displayUI(water, environment, fpsText);
     window.update();
   }
 }
@@ -191,8 +118,7 @@ void Engine::_handleInput(void) const {
   }
 }
 
-void Engine::_displayUI(Water& water, Fog& fog, CubeMap& skybox,
-                        char* fpsText) {
+void Engine::_displayUI(Water& water, Environment& environment, char* fpsText) {
   interface.createFrame();
   ImGui::Begin("Setting");
 
@@ -233,25 +159,26 @@ void Engine::_displayUI(Water& water, Fog& fog, CubeMap& skybox,
 
   if (ImGui::CollapsingHeader("Lighting")) {
     ImGui::ColorEdit3("Sky Color", value_ptr(_skyColor));
-    ImGui::ColorEdit3("Light Color", value_ptr(_lightColor));
-
-    ImGui::SliderFloat3("Direction", value_ptr(_lightDirection), -1.0f, 1.0f);
+    ImGui::ColorEdit3("Light Color", value_ptr(environment.lightColor));
+    ImGui::SliderFloat3("Direction", value_ptr(environment.lightDirection),
+                        -1.0f, 1.0f);
 
     ImGui::Separator();
-
-    ImGui::DragFloat("Sun Size", &skybox.sunSize, 0.01f, 0.0f, 100.0f);
-    ImGui::DragFloat("Sun Brightness", &skybox.sunBrightness, 0.01f, 0.0f,
-                     10.0f);
+    ImGui::DragFloat("Sun Size", &environment.skybox.sunSize, 0.01f, 0.0f,
+                     100.0f);
+    ImGui::DragFloat("Sun Brightness", &environment.skybox.sunBrightness, 0.01f,
+                     0.0f, 10.0f);
   }
 
   if (ImGui::CollapsingHeader("Fog")) {
-    ImGui::ColorEdit3("Fog Color", value_ptr(fog.color));
+    ImGui::Checkbox("Enable Fog", &environment.fog.enabled);
+    ImGui::ColorEdit3("Fog Color", value_ptr(environment.fog.color));
 
-    ImGui::DragFloat("Fog Near", &fog.near, 0.1f, 0.0f, 1000.0f);
-    ImGui::DragFloat("Fog Far", &fog.far, 0.1f, 0.0f, 5000.0f);
+    ImGui::DragFloat("Fog Near", &environment.fog.near, 0.1f, 0.0f, 1000.0f);
+    ImGui::DragFloat("Fog Far", &environment.fog.far, 0.1f, 0.0f, 5000.0f);
 
-    ImGui::InputFloat("Fog Steepness", &fog.steepnees);
-    ImGui::InputFloat("Fog Offset", &fog.offset);
+    ImGui::InputFloat("Fog Steepness", &environment.fog.steepness);
+    ImGui::InputFloat("Fog Offset", &environment.fog.offset);
   }
 
   ImGui::End();

@@ -10,12 +10,13 @@
 
 #include <components/Camera.hpp>
 #include <components/CubeMap.hpp>
-#include <components/VisualEffects.hpp>
 #include <components/Interface.hpp>
 #include <components/Water.hpp>
+#include <components/Environment.hpp>
 #include <core/Object.hpp>
 #include <core/Shader.hpp>
 #include <core/Window.hpp>
+#include <effects/Fog.hpp>
 
 #include <exception>
 
@@ -45,7 +46,7 @@ private:
   void _initGLAD(void) const;
   void _handleInput(void) const;
   void _updateDeltaTime(void);
-  void _displayUI(Water& water, Fog& fog, CubeMap& skybox, char* fpsText);
+  void _displayUI(Water& water, Environment& environment, char* fpsText);
 
 public:
   class WindowInitFailedException : std::exception {

@@ -51,8 +51,8 @@ EXT_FILE	:= imgui/imgui_draw.cpp \
 
 SRC_FILE	:= components/Camera.cpp \
 			   components/CubeMap.cpp \
+			   components/Environment.cpp \
 			   components/Interface.cpp \
-			   components/PostProcessFrame.cpp \
 			   components/Water.cpp \
 			   core/objects/EBO.cpp \
 			   core/objects/FBO.cpp \
@@ -63,6 +63,7 @@ SRC_FILE	:= components/Camera.cpp \
 			   core/Shader.cpp \
 			   core/Texture.cpp \
 			   core/Window.cpp \
+			   effects/Fog.cpp \
 			   main.cpp
 
 SRC_CXX		:= $(addprefix $(EXT_DIR)/, $(EXT_FILE)) \

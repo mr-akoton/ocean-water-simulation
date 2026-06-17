@@ -1,0 +1,474 @@
+diff --git a/Makefile b/Makefile
+index a6de82b..7af8cca 100644
+--- a/Makefile
++++ b/Makefile
+@@ -51,8 +51,8 @@ EXT_FILE	:= imgui/imgui_draw.cpp \
+ 
+ SRC_FILE	:= components/Camera.cpp \
+ 			   components/CubeMap.cpp \
++			   components/Environment.cpp \
+ 			   components/Interface.cpp \
+-			   components/PostProcessFrame.cpp \
+ 			   components/Water.cpp \
+ 			   core/objects/EBO.cpp \
+ 			   core/objects/FBO.cpp \
+@@ -63,6 +63,7 @@ SRC_FILE	:= components/Camera.cpp \
+ 			   core/Shader.cpp \
+ 			   core/Texture.cpp \
+ 			   core/Window.cpp \
++			   effects/Fog.cpp \
+ 			   main.cpp
+ 
+ SRC_CXX		:= $(addprefix $(EXT_DIR)/, $(EXT_FILE)) \
+diff --git a/compile_commands.json b/compile_commands.json
+index f79206b..34812b9 100644
+--- a/compile_commands.json
++++ b/compile_commands.json
+@@ -236,7 +236,7 @@
+     "output": "src/components/Interface.o"
+   },
+   {
+-    "file": "src/components/PostProcessFrame.cpp",
++    "file": "src/components/Environment.cpp",
+     "arguments": [
+       "/usr/bin/g++",
+       "-Wall",
+@@ -251,11 +251,11 @@
+       "./lib",
+       "-c",
+       "-o",
+-      "src/components/PostProcessFrame.o",
+-      "src/components/PostProcessFrame.cpp"
++      "src/components/Environment.o",
++      "src/components/Environment.cpp"
+     ],
+     "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
+-    "output": "src/components/PostProcessFrame.o"
++    "output": "src/components/Environment.o"
+   },
+   {
+     "file": "src/components/Water.cpp",
+@@ -477,6 +477,28 @@
+     "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
+     "output": "src/core/Window.o"
+   },
++  {
++    "file": "src/effects/Fog.cpp",
++    "arguments": [
++      "/usr/bin/g++",
++      "-Wall",
++      "-Wextra",
++      "-Wpedantic",
++      "-O0",
++      "-g",
++      "-std=c++17",
++      "-I",
++      "./inc",
++      "-I",
++      "./lib",
++      "-c",
++      "-o",
++      "src/effects/Fog.o",
++      "src/effects/Fog.cpp"
++    ],
++    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
++    "output": "src/effects/Fog.o"
++  },
+   {
+     "file": "src/main.cpp",
+     "arguments": [
+@@ -499,4 +521,4 @@
+     "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
+     "output": "src/main.o"
+   }
+-]
+\ No newline at end of file
++]
+diff --git a/imgui.ini b/imgui.ini
+index f52b4ea..09e4c9c 100644
+--- a/imgui.ini
++++ b/imgui.ini
+@@ -3,7 +3,7 @@ Pos=60,60
+ Size=400,400
+ 
+ [Window][Setting]
+-Pos=888,11
++Pos=888,10
+ Size=356,690
+ 
+ [Window][FPS]
+diff --git a/inc/components/PostProcessFrame.hpp b/inc/components/PostProcessFrame.hpp
+deleted file mode 100644
+index 94347e7..0000000
+--- a/inc/components/PostProcessFrame.hpp
++++ /dev/null
+@@ -1,36 +0,0 @@
+-#ifndef POST_PROCESS_FRAME
+-#define POST_PROCESS_FRAME
+-
+-#include <glad/glad.h>
+-#include <GLFW/glfw3.h>
+-
+-#include <glm/glm.hpp>
+-#include <core/Engine.hpp>
+-#include <core/Object.hpp>
+-#include <core/Texture.hpp>
+-#include <core/Shader.hpp>
+-
+-#include <vector>
+-
+-class PostProcessFrame {
+-private:
+-  static const std::vector<glm::vec4> _vertices;
+-
+-  VAO _vao;
+-  VBO _vbo;
+-  FBO _fbo;
+-  RBO _rbo;
+-
+-public:
+-  Shader shader;
+-
+-public:
+-  PostProcessFrame(void);
+-  ~PostProcessFrame();
+-
+-  void bind(void) const;
+-  void unbind(void) const;
+-  void render(void) const;
+-};
+-
+-#endif
+diff --git a/inc/components/VisualEffects.hpp b/inc/components/VisualEffects.hpp
+deleted file mode 100644
+index 5d5c02b..0000000
+--- a/inc/components/VisualEffects.hpp
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#ifndef VISUAL_EFFECTS_HPP
+-#define VISUAL_EFFECTS_HPP
+-
+-#include <glm/glm.hpp>
+-
+-struct Fog {
+-  glm::vec3 color;
+-  float near;
+-  float far;
+-  float steepnees;
+-  float offset;
+-};
+-
+-#endif
+diff --git a/inc/core/Engine.hpp b/inc/core/Engine.hpp
+index 546761a..bdde30d 100644
+--- a/inc/core/Engine.hpp
++++ b/inc/core/Engine.hpp
+@@ -10,12 +10,13 @@
+ 
+ #include <components/Camera.hpp>
+ #include <components/CubeMap.hpp>
+-#include <components/VisualEffects.hpp>
+ #include <components/Interface.hpp>
+ #include <components/Water.hpp>
++#include <components/Environment.hpp>
+ #include <core/Object.hpp>
+ #include <core/Shader.hpp>
+ #include <core/Window.hpp>
++#include <effects/Fog.hpp>
+ 
+ #include <exception>
+ 
+@@ -45,7 +46,7 @@ private:
+   void _initGLAD(void) const;
+   void _handleInput(void) const;
+   void _updateDeltaTime(void);
+-  void _displayUI(Water& water, Fog& fog, CubeMap& skybox, char* fpsText);
++  void _displayUI(Water& water, Environment& environment, char* fpsText);
+ 
+ public:
+   class WindowInitFailedException : std::exception {
+diff --git a/shader/postpro-fragment.glsl b/shader/postpro-fragment.glsl
+index 0177e31..5204e15 100644
+--- a/shader/postpro-fragment.glsl
++++ b/shader/postpro-fragment.glsl
+@@ -4,10 +4,12 @@ uniform vec3 u_viewPosition;
+ uniform sampler2D u_colorTexture;
+ uniform sampler2D u_depthTexture;
+ 
+-uniform float u_near;
+-uniform float u_far;
+-uniform float u_steepness;
+-uniform float u_offset;
++uniform bool u_enableFog;
++
++uniform float u_fogNear;
++uniform float u_fogFar;
++uniform float u_fogSteepness;
++uniform float u_fogOffset;
+ uniform vec3 u_fogColor;
+ 
+ in vec2 p_textureCoords;
+@@ -15,17 +17,21 @@ in vec2 p_textureCoords;
+ out vec4 FragColor;
+ 
+ float linearizeDepth(float depth) {
+-    return (2.0 * u_near * u_far) / (u_far + u_near - (depth * 2.0 - 1.0) * (u_far - u_near));
++    return (2.0 * u_fogNear * u_fogFar) / (u_fogFar + u_fogNear - (depth * 2.0 - 1.0) * (u_fogFar - u_fogNear));
+ }
+ 
+ float logisticDepth(float depth) {
+     float zValue = linearizeDepth(depth);
+-    return (1.0 / (1.0 + exp(-u_steepness * (zValue - u_offset))));
++    return (1.0 / (1.0 + exp(-u_fogSteepness * (zValue - u_fogOffset))));
+ }
+ 
+ void main() {
+     float depth = logisticDepth(texture(u_depthTexture, p_textureCoords).r);
+-    vec3 color = texture(u_colorTexture, p_textureCoords).rgb;
++    vec3 final_color = texture(u_colorTexture, p_textureCoords).rgb;
++
++    if (u_enableFog) {
++        final_color = mix(final_color, u_fogColor, depth);
++    }
+ 
+-    FragColor = vec4(mix(color, u_fogColor, depth), 1.0);
++    FragColor = vec4(final_color, 1.0);
+ }
+diff --git a/src/components/PostProcessFrame.cpp b/src/components/PostProcessFrame.cpp
+deleted file mode 100644
+index 0258736..0000000
+--- a/src/components/PostProcessFrame.cpp
++++ /dev/null
+@@ -1,54 +0,0 @@
+-#include <components/PostProcessFrame.hpp>
+-#include <settings.hpp>
+-#include <iostream>
+-
+-const std::vector<glm::vec4> PostProcessFrame::_vertices{
+-    {1.0f, -1.0f, 1.0f, 0.0f}, {-1.0f, -1.0f, 0.0f, 0.0f},
+-    {-1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f},
+-    {1.0f, -1.0f, 1.0f, 0.0f}, {-1.0f, 1.0f, 0.0f, 0.0f},
+-};
+-
+-/* ========================================================================== */
+-/*                         CONSTRUCTOR AND DESTRUCTOR                         */
+-/* ========================================================================== */
+-
+-PostProcessFrame::PostProcessFrame(void)
+-    : _vao(), _vbo(_vertices), _fbo(), _rbo(WINDOW_WIDTH, WINDOW_HEIGHT),
+-      shader("shader/postpro-vertex.glsl", "shader/postpro-fragment.glsl") {
+-  _vao.bind();
+-  _vao.linkAttribute(_vbo, 0, 2, GL_FLOAT, sizeof(glm::vec4), (void*)0);
+-  _vao.linkAttribute(_vbo, 1, 2, GL_FLOAT, sizeof(glm::vec4),
+-                     (void*)(2 * sizeof(float)));
+-  _vao.unbind();
+-
+-  _fbo.bind();
+-  if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+-    std::cerr << "Framebuffer is not complete!" << std::endl;
+-  }
+-  _fbo.unbind();
+-
+-  glActiveTexture(GL_TEXTURE0);
+-}
+-
+-PostProcessFrame::~PostProcessFrame() {}
+-
+-/* ========================================================================== */
+-/*                                   BINDER                                   */
+-/* ========================================================================== */
+-
+-void PostProcessFrame::bind(void) const { _fbo.bind(); }
+-
+-void PostProcessFrame::unbind(void) const { _fbo.unbind(); }
+-
+-/* ========================================================================== */
+-/*                                  RENDERER                                  */
+-/* ========================================================================== */
+-
+-void PostProcessFrame::render(void) const {
+-  _vao.bind();
+-
+-  shader.enable();
+-  glDisable(GL_DEPTH_TEST);
+-
+-  glDrawArrays(GL_TRIANGLES, 0, 6);
+-}
+diff --git a/src/core/Engine.cpp b/src/core/Engine.cpp
+index aa5c004..f3bd2cb 100644
+--- a/src/core/Engine.cpp
++++ b/src/core/Engine.cpp
+@@ -1,6 +1,5 @@
+ #include <core/Engine.hpp>
+ #include <settings.hpp>
+-#include <iostream>
+ 
+ using namespace glm;
+ 
+@@ -70,67 +69,12 @@ void Engine::run(void) {
+   Water water(1000, 1000);
+   water.init();
+ 
+-  Fog fogParams;
+-  fogParams.color = vec3(0.769f, 0.775f, 0.680f);
+-  fogParams.near = 0.1f;
+-  fogParams.far = 1000.0f;
+-  fogParams.steepnees = 0.005f;
+-  fogParams.offset = 500.0f;
+-
+-  CubeMap skybox((const char**)SKYBOX_FACES);
++  Environment environment;
++  CubeMap& skybox = environment.skybox;
+ 
+   float lastTime = glfwGetTime();
+   char fpsText[100] = "Debug: 0 ms/frame";
+ 
+-  // Post process
+-  Shader ppShader("shader/postpro-vertex.glsl", "shader/postpro-fragment.glsl");
+-  ppShader.enable();
+-  ppShader.setInt("u_colorTexture", 0);
+-  ppShader.setInt("u_depthTexture", 1);
+-
+-  VAO ppvao;
+-  ppvao.bind();
+-  VBO ppvbo(PPVertices);
+-  ppvbo.bind();
+-  ppvao.linkAttribute(ppvbo, 0, 2, GL_FLOAT, sizeof(glm::vec4), (void*)0);
+-  ppvao.linkAttribute(ppvbo, 1, 2, GL_FLOAT, sizeof(glm::vec4),
+-                      (void*)(2 * sizeof(float)));
+-  ppvao.unbind();
+-  ppvbo.unbind();
+-
+-  GLuint fbo;
+-  glGenFramebuffers(1, &fbo);
+-  glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+-
+-  GLuint frameBufferTexture;
+-  glActiveTexture(GL_TEXTURE0);
+-  glGenTextures(1, &frameBufferTexture);
+-  glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
+-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WINDOW_WIDTH, WINDOW_HEIGHT, 0, GL_RGB,
+-               GL_UNSIGNED_BYTE, NULL);
+-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+-                         frameBufferTexture, 0);
+-
+-  GLuint depthTexture;
+-  glActiveTexture(GL_TEXTURE1);
+-  glGenTextures(1, &depthTexture);
+-  glBindTexture(GL_TEXTURE_2D, depthTexture);
+-  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, WINDOW_WIDTH,
+-               WINDOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
+-                         depthTexture, 0);
+-
+-  auto fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+-  if (fboStatus != GL_FRAMEBUFFER_COMPLETE) {
+-    std::cerr << "Framebuffer error: " << fboStatus << std::endl;
+-  }
+-
+   while (not window.shouldClose()) {
+     glfwPollEvents();
+     _handleInput();
+@@ -143,40 +87,23 @@ void Engine::run(void) {
+       lastTime += 1.0f;
+     }
+ 
+-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+-
++    environment.attach();
+     glClearColor(_skyColor.x, _skyColor.y, _skyColor.z, 1.0f);
+     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+-
+     camera.updateMatrix(45.0f, 0.1f, 2000.f);
+ 
+     if (not interface.wantCaptureMouse()) {
+       camera.handleInput(window, _deltaTime);
+     }
+ 
+-    water.render(camera, _lightDirection, _lightColor);
+-    skybox.render(camera, _lightDirection, _lightColor, _skyColor);
+-
+-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
++    water.render(camera, environment.lightDirection, environment.lightColor);
++    skybox.render(camera, environment.lightDirection, environment.lightColor,
++                  _skyColor);
+ 
+-    glDisable(GL_DEPTH_TEST);
+-    ppvao.bind();
+-    ppShader.enable();
+-    ppShader.setVec3("u_fogColor", fogParams.color);
+-    ppShader.setFloat("u_near", fogParams.near);
+-    ppShader.setFloat("u_far", fogParams.far);
+-    ppShader.setFloat("u_steepness", fogParams.steepnees);
+-    ppShader.setFloat("u_offset", fogParams.offset);
+-    ppShader.setVec3("u_viewPosition", camera.position);
+-
+-    glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
+-    glBindTexture(GL_TEXTURE_2D, depthTexture);
+-
+-    glDrawArrays(GL_TRIANGLES, 0, 6);
+-    glEnable(GL_DEPTH_TEST);
+-
+-    _displayUI(water, fogParams, skybox, fpsText);
++    environment.detach();
++    environment.render(camera);
+ 
++    _displayUI(water, environment, fpsText);
+     window.update();
+   }
+ }
+@@ -191,8 +118,7 @@ void Engine::_handleInput(void) const {
+   }
+ }
+ 
+-void Engine::_displayUI(Water& water, Fog& fog, CubeMap& skybox,
+-                        char* fpsText) {
++void Engine::_displayUI(Water& water, Environment& environment, char* fpsText) {
+   interface.createFrame();
+   ImGui::Begin("Setting");
+ 
+@@ -233,25 +159,26 @@ void Engine::_displayUI(Water& water, Fog& fog, CubeMap& skybox,
+ 
+   if (ImGui::CollapsingHeader("Lighting")) {
+     ImGui::ColorEdit3("Sky Color", value_ptr(_skyColor));
+-    ImGui::ColorEdit3("Light Color", value_ptr(_lightColor));
+-
+-    ImGui::SliderFloat3("Direction", value_ptr(_lightDirection), -1.0f, 1.0f);
++    ImGui::ColorEdit3("Light Color", value_ptr(environment.lightColor));
++    ImGui::SliderFloat3("Direction", value_ptr(environment.lightDirection),
++                        -1.0f, 1.0f);
+ 
+     ImGui::Separator();
+-
+-    ImGui::DragFloat("Sun Size", &skybox.sunSize, 0.01f, 0.0f, 100.0f);
+-    ImGui::DragFloat("Sun Brightness", &skybox.sunBrightness, 0.01f, 0.0f,
+-                     10.0f);
++    ImGui::DragFloat("Sun Size", &environment.skybox.sunSize, 0.01f, 0.0f,
++                     100.0f);
++    ImGui::DragFloat("Sun Brightness", &environment.skybox.sunBrightness, 0.01f,
++                     0.0f, 10.0f);
+   }
+ 
+   if (ImGui::CollapsingHeader("Fog")) {
+-    ImGui::ColorEdit3("Fog Color", value_ptr(fog.color));
++    ImGui::Checkbox("Enable Fog", &environment.fog.enabled);
++    ImGui::ColorEdit3("Fog Color", value_ptr(environment.fog.color));
+ 
+-    ImGui::DragFloat("Fog Near", &fog.near, 0.1f, 0.0f, 1000.0f);
+-    ImGui::DragFloat("Fog Far", &fog.far, 0.1f, 0.0f, 5000.0f);
++    ImGui::DragFloat("Fog Near", &environment.fog.near, 0.1f, 0.0f, 1000.0f);
++    ImGui::DragFloat("Fog Far", &environment.fog.far, 0.1f, 0.0f, 5000.0f);
+ 
+-    ImGui::InputFloat("Fog Steepness", &fog.steepnees);
+-    ImGui::InputFloat("Fog Offset", &fog.offset);
++    ImGui::InputFloat("Fog Steepness", &environment.fog.steepness);
++    ImGui::InputFloat("Fog Offset", &environment.fog.offset);
+   }
+ 
+   ImGui::End();
