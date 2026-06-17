@@ -8,6 +8,11 @@ INC_DIR		:= ./inc
 LIB_DIR		:= ./lib
 EXT_DIR		:= ./ext
 
+BLD_DIR		:= ./build
+SHD_DIR		:= ./shader
+RES_DIR		:= ./resources
+
+
 BUILD_TYPE	?= debug
 
 # ============================================================================ #
@@ -73,6 +78,15 @@ all: $(NAME)
 
 $(NAME): $(OBJ_C) $(OBJ_CXX)
 	$(CXX) $(CXXFLAGS) $(OBJ) $(LDFLAGS) -o $@
+
+build: re
+	@mkdir -p $(BLD_DIR)
+	@mv $(NAME) $(BLD_DIR)
+	@cp -r $(SHD_DIR) $(RES_DIR) $(BLD_DIR)/.
+
+archive:
+	zip -r $(NAME).zip $(BLD_DIR)
+	tar -czvf $(NAME).tar.gz $(BLD_DIR)
 
 run: all
 	@./$(NAME)
