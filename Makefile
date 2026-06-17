@@ -13,7 +13,6 @@ BLD_DIR		:= ./build
 SHD_DIR		:= ./shader
 RES_DIR		:= ./resources
 
-
 BUILD_TYPE	?= debug
 
 # ============================================================================ #
@@ -42,7 +41,6 @@ RM			:= rm -rf
 
 SRC_C		:= $(EXT_DIR)/glad/glad.c
 OBJ_C   	:= $(addprefix $(OBJ_DIR)/, $(patsubst ./%,%,$(SRC_C:.c=.o)))
-# OBJ_C		:= $(SRC_C:.c=.o)
 
 # --------------------------------- C++ Files -------------------------------- #
 
@@ -73,7 +71,6 @@ SRC_FILE	:= components/Camera.cpp \
 
 SRC_CXX		:= $(addprefix $(EXT_DIR)/, $(EXT_FILE)) \
 			   $(addprefix $(SRC_DIR)/, $(SRC_FILE))
-# OBJ_CXX		:= $(SRC_CXX:.cpp=.o)
 OBJ_CXX 	:= $(addprefix $(OBJ_DIR)/, $(patsubst ./%,%,$(SRC_CXX:.cpp=.o)))
 
 # ------------------------------- Final Object ------------------------------- #
