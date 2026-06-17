@@ -3,4 +3,7 @@
 draft.tldr
 
 *.o
+*.zip
+*.tar.gz
+build
 water-simulation
