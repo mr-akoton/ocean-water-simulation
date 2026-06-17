@@ -76,6 +76,18 @@ void Camera::_handleMouseInput(const Window& window) {
 }
 
 /* ========================================================================== */
+/*                                   GETTER                                   */
+/* ========================================================================== */
+
+mat4 Camera::getView(void) const {
+  return lookAt(position, position + orientation, up);
+}
+
+mat4 Camera::getProjection(float fov, float near, float far) const {
+  return perspective(radians(fov), ratio, near, far);
+}
+
+/* ========================================================================== */
 /*                                   UPDATE                                   */
 /* ========================================================================== */
 

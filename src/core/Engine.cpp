@@ -56,17 +56,8 @@ void Engine::_initGLAD(void) const {
 /*                                     RUN                                    */
 /* ========================================================================== */
 
-const std::vector<glm::vec4> PPVertices{
-    {-1.0f, -1.0f, 0.0f, 0.0f}, // 1
-    {+1.0f, -1.0f, 1.0f, 0.0f}, // 2
-    {+1.0f, +1.0f, 1.0f, 1.0f}, // 3
-    {-1.0f, -1.0f, 0.0f, 0.0f}, // 4
-    {+1.0f, +1.0f, 1.0f, 1.0f}, // 5
-    {-1.0f, +1.0f, 0.0f, 1.0f}, // 6
-};
-
 void Engine::run(void) {
-  Water water(1000, 1000);
+  Water water(500, 500);
   water.init();
 
   Environment environment;
@@ -90,7 +81,7 @@ void Engine::run(void) {
     environment.attach();
     glClearColor(_skyColor.x, _skyColor.y, _skyColor.z, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    camera.updateMatrix(45.0f, 0.1f, 2000.f);
+    camera.updateMatrix(CAMERA_FOV, CAMERA_NEAR, CAMERA_FAR);
 
     if (not interface.wantCaptureMouse()) {
       camera.handleInput(window, _deltaTime);

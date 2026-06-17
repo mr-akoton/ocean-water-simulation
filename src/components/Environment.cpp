@@ -81,6 +81,9 @@ void Environment::render(Camera& camera) {
   _vao.bind();
   shader.enable();
 
+  shader.setMat4("u_invProjection", glm::inverse(camera.getProjection(
+                                        CAMERA_FOV, CAMERA_NEAR, CAMERA_FAR)));
+  shader.setMat4("u_invView", glm::inverse(camera.getView()));
   shader.setVec3("u_viewPosition", camera.position);
 
   shader.setBool("u_enableFog", fog.enabled);
