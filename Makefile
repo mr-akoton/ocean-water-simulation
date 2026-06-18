@@ -15,6 +15,11 @@ RES_DIR		:= ./resources
 
 SETTINGS	:= ./settings.json
 
+BLD_DIR		:= ./build
+SHD_DIR		:= ./shader
+RES_DIR		:= ./resources
+
+
 BUILD_TYPE	?= debug
 
 # ============================================================================ #
