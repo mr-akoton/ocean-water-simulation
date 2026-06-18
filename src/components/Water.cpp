@@ -19,6 +19,7 @@ Water::Water(unsigned int width, unsigned int height, float gridSize,
       position(position), color(0.629f, 0.883f, 0.917f), model(1.0f),
       shader(VERTEX_SHADER, FRAGMENT_SHADER) {
   model = translate(model, position);
+  shader.setInt("u_skybox", 0);
 }
 
 Water::~Water() {}

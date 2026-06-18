@@ -23,7 +23,7 @@ void main() {
     vec3 sunColor = u_lightColor * u_sunBrightness;
 
     // Composite
-    vec3 finalColor = u_skyColor.rgb + sunColor * (sunDisk + sunGlow * 0.3);
+    vec3 finalColor = texture(u_skybox, p_textureCoords).rgb + sunColor * (sunDisk + sunGlow * 0.3);
 
     FragColor = vec4(finalColor, 1.0);
 }
