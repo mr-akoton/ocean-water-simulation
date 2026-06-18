@@ -1,6 +1,6 @@
 #include <components/CubeMap.hpp>
 #include <components/Environment.hpp>
-#include <settings.hpp>
+#include <settings/SettingsData.hpp>
 #include <iostream>
 
 const std::vector<glm::vec3> CubeMap::_vertices{
@@ -22,8 +22,8 @@ const std::vector<GLuint> CubeMap::_indices{
 /* ========================================================================== */
 
 CubeMap::CubeMap(const char* textures[6])
-    : _vao(), _vbo(this->_vertices), _ebo(this->_indices), sunSize(0.999),
-      sunBrightness(1.5),
+    : _vao(), _vbo(this->_vertices), _ebo(this->_indices), sunSize(0.999f),
+      sunBrightness(1.5f),
       shader("shader/skybox-vertex.glsl", "shader/skybox-fragment.glsl") {
   _vao.bind();
   _ebo.bind();

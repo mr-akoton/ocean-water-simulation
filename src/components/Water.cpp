@@ -14,7 +14,7 @@ Water::Water(unsigned int width, unsigned int height, float gridSize,
     : width(width), height(height), gridSize(gridSize), iteration(32),
       amplitude(8.0), frequency(0.02), speed(1.4), drag(1.4), peakMax(1.0),
       peakOffset(1.0), amplitudeMult(0.82), frequencyMult(1.18),
-      speedMult(1.07), iterationMult(1.18), ambienColor(1.0f),
+      speedMult(1.07), iterationMult(1.18), ambientColor(1.0f),
       ambientStrength(0.4), specularStrength(1.0), shininess(256),
       position(position), color(0.629f, 0.883f, 0.917f), model(1.0f),
       shader(VERTEX_SHADER, FRAGMENT_SHADER) {
@@ -94,7 +94,7 @@ void Water::render(Camera& camera, Environment& environment) const {
   shader.setFloat("u_iterationMult", iterationMult);
 
   shader.setFloat("u_ambientStrength", ambientStrength);
-  shader.setVec3("u_ambientColor", ambienColor);
+  shader.setVec3("u_ambientColor", ambientColor);
   shader.setFloat("u_specularStrength", specularStrength);
   shader.setInt("u_shininess", shininess);
 

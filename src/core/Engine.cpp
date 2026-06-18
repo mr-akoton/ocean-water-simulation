@@ -1,5 +1,10 @@
+#include "components/Environment.hpp"
+#include "imgui/imgui.h"
+#include "settings/SettingsManager.hpp"
 #include <core/Engine.hpp>
-#include <settings.hpp>
+#include <iostream>
+#include <ostream>
+#include <settings/SettingsData.hpp>
 
 using namespace glm;
 
@@ -55,12 +60,14 @@ void Engine::_initGLAD(void) const {
 /* ========================================================================== */
 
 void Engine::run(void) {
-  Water water(500, 500);
+  Water water(1000, 1000);
   water.init();
 
   Environment environment;
   CubeMap& skybox = environment.skybox;
   vec3 skyColor = environment.skyColor;
+
+  _loadSettings(water, environment);
 
   float lastTime = glfwGetTime();
   char fpsText[100] = "Debug: 0 ms/frame";
@@ -107,7 +114,6 @@ void Engine::_handleInput(void) {
   if (window.isKeyPressed(GLFW_KEY_ESCAPE)) {
     window.close();
   }
-
   if (window.isKeyJustPressed(GLFW_KEY_T)) {
     _isUIEnable = not _isUIEnable;
   }
@@ -118,10 +124,14 @@ void Engine::_displayUI(Water& water, Environment& environment, char* fpsText) {
   ImGui::Begin("Setting");
 
   ImGui::TextUnformatted(fpsText);
+  if (ImGui::Button("Save")) {
+    _saveSettings(water, environment);
+  }
+
   ImGui::Separator();
 
   if (ImGui::CollapsingHeader("Water", ImGuiTreeNodeFlags_DefaultOpen)) {
-    ImGui::ColorEdit3("Color", value_ptr(water.color));
+    ImGui::ColorEdit3("Water Color", value_ptr(water.color));
 
     ImGui::DragInt("Iterations", &water.iteration, 0.1f, 1, 100);
 
@@ -144,7 +154,7 @@ void Engine::_displayUI(Water& water, Environment& environment, char* fpsText) {
                      10.0f);
 
     ImGui::SeparatorText("Materials");
-    ImGui::ColorEdit3("Ambient Color", value_ptr(water.ambienColor));
+    ImGui::ColorEdit3("Ambient Color", value_ptr(water.ambientColor));
     ImGui::SliderFloat("Ambient Strength", &water.ambientStrength, 0.0f, 1.0f,
                        "%.2f");
     ImGui::SliderFloat("Specular Strength", &water.specularStrength, 0.0f, 1.0f,
@@ -178,6 +188,88 @@ void Engine::_displayUI(Water& water, Environment& environment, char* fpsText) {
 
   ImGui::End();
   interface.render();
+}
+
+/* ========================================================================== */
+/*                                   SETTINGS                                 */
+/* ========================================================================== */
+
+void Engine::_loadSettings(Water& water, Environment& environment) {
+  setting::data settings;
+
+  if (SettingsManager::load("settings.json", settings) == false) {
+    std::cerr << "Warning: failed to load settings.json.\nDefault settings are "
+                 "applied instead."
+              << std::endl;
+  }
+
+  water.iteration = settings.iteration;
+  water.amplitude = settings.amplitude;
+  water.frequency = settings.frequency;
+  water.speed = settings.speed;
+  water.drag = settings.drag;
+  water.peakMax = settings.peakMax;
+  water.peakOffset = settings.peakOffset;
+  water.amplitudeMult = settings.amplitudeMult;
+  water.frequencyMult = settings.frequencyMult;
+  water.speedMult = settings.speedMult;
+  water.iterationMult = settings.iterationMult;
+  water.ambientColor = settings.ambientColor;
+  water.color = settings.waterColor;
+  water.ambientStrength = settings.ambientStrength;
+  water.specularStrength = settings.specularStrength;
+  water.shininess = settings.shininess;
+
+  environment.fog.enabled = settings.enableFog;
+  environment.fog.color = settings.fogColor;
+  environment.fog.far = settings.fogFar;
+  environment.fog.near = settings.fogNear;
+  environment.fog.offset = settings.fogOffset;
+  environment.fog.steepness = settings.fogSteepness;
+  environment.skybox.sunBrightness = settings.sunBrightness;
+  environment.skybox.sunSize = settings.sunSize;
+  environment.skyColor = settings.skyColor;
+  environment.lightDirection = settings.lightDirection;
+  environment.lightColor = settings.lightColor;
+}
+
+void Engine::_saveSettings(const Water& water, const Environment& environment) {
+  setting::data settings;
+
+  settings.iteration = water.iteration;
+  settings.amplitude = water.amplitude;
+  settings.frequency = water.frequency;
+  settings.speed = water.speed;
+  settings.drag = water.drag;
+  settings.peakMax = water.peakMax;
+  settings.peakOffset = water.peakOffset;
+  settings.amplitudeMult = water.amplitudeMult;
+  settings.frequencyMult = water.frequencyMult;
+  settings.speedMult = water.speedMult;
+  settings.iterationMult = water.iterationMult;
+  settings.ambientColor = water.ambientColor;
+  settings.waterColor = water.color;
+  settings.ambientStrength = water.ambientStrength;
+  settings.specularStrength = water.specularStrength;
+  settings.shininess = water.shininess;
+
+  settings.enableFog = environment.fog.enabled;
+  settings.fogColor = environment.fog.color;
+  settings.fogFar = environment.fog.far;
+  settings.fogNear = environment.fog.near;
+  settings.fogOffset = environment.fog.offset;
+  settings.fogSteepness = environment.fog.steepness;
+  settings.sunBrightness = environment.skybox.sunBrightness;
+  settings.sunSize = environment.skybox.sunSize;
+  settings.skyColor = environment.skyColor;
+  settings.lightDirection = environment.lightDirection;
+  settings.lightColor = environment.lightColor;
+
+  if (SettingsManager::save("settings.json", settings) == false) {
+    std::cerr << "Error: failed to save your settings.\n." << std::endl;
+  } else {
+    std::cout << "Settings successfully saved !" << std::endl;
+  }
 }
 
 /* ========================================================================== */

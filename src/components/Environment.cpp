@@ -1,6 +1,6 @@
 #include <components/Environment.hpp>
 #include <components/CubeMap.hpp>
-#include <settings.hpp>
+#include <settings/SettingsData.hpp>
 #include <iostream>
 
 const std::vector<glm::vec4> Environment::_vertices{

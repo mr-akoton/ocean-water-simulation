@@ -500,6 +500,50 @@
     "output": "obj/src/effects/Fog.o"
   },
   {
+    "file": "src/settings/SettingsData.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-O0",
+      "-g",
+      "-std=c++17",
+      "-I",
+      "./inc",
+      "-I",
+      "./lib",
+      "-c",
+      "src/settings/SettingsData.cpp",
+      "-o",
+      "obj/src/settings/SettingsData.o"
+    ],
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/src/settings/SettingsData.o"
+  },
+  {
+    "file": "src/settings/SettingsManager.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-O0",
+      "-g",
+      "-std=c++17",
+      "-I",
+      "./inc",
+      "-I",
+      "./lib",
+      "-c",
+      "src/settings/SettingsManager.cpp",
+      "-o",
+      "obj/src/settings/SettingsManager.o"
+    ],
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/src/settings/SettingsManager.o"
+  },
+  {
     "file": "src/main.cpp",
     "arguments": [
       "/usr/bin/g++",

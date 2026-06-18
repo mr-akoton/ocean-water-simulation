@@ -37,7 +37,7 @@ public:
   float speedMult;
   float iterationMult;
 
-  glm::vec3 ambienColor;
+  glm::vec3 ambientColor;
   float ambientStrength;
   float specularStrength;
   int shininess;

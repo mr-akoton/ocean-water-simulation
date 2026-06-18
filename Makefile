@@ -13,6 +13,8 @@ BLD_DIR		:= ./build
 SHD_DIR		:= ./shader
 RES_DIR		:= ./resources
 
+SETTINGS	:= ./settings.json
+
 BUILD_TYPE	?= debug
 
 # ============================================================================ #
@@ -67,6 +69,8 @@ SRC_FILE	:= components/Camera.cpp \
 			   core/Texture.cpp \
 			   core/Window.cpp \
 			   effects/Fog.cpp \
+			   settings/SettingsData.cpp \
+			   settings/SettingsManager.cpp \
 			   main.cpp
 
 SRC_CXX		:= $(addprefix $(EXT_DIR)/, $(EXT_FILE)) \
@@ -93,10 +97,11 @@ all: $(NAME)
 $(NAME): $(OBJ_C) $(OBJ_CXX)
 	$(CXX) $(CXXFLAGS) $(OBJ) $(LDFLAGS) -o $@
 
-build: re
+build:
+	@BUILD_TYPE=release make re
 	@mkdir -p $(BLD_DIR)
 	@mv $(NAME) $(BLD_DIR)
-	@cp -r $(SHD_DIR) $(RES_DIR) $(BLD_DIR)/.
+	@cp -r $(SETTINGS) $(SHD_DIR) $(RES_DIR) $(BLD_DIR)/.
 
 archive:
 	zip -r $(NAME).zip $(BLD_DIR)

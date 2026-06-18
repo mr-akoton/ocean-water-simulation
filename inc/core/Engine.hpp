@@ -1,6 +1,7 @@
 #ifndef ENGINE_HPP
 #define ENGINE_HPP
 
+#include "components/Environment.hpp"
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
@@ -15,6 +16,7 @@
 #include <core/Shader.hpp>
 #include <core/Window.hpp>
 #include <effects/Fog.hpp>
+#include <settings/SettingsManager.hpp>
 
 #include <exception>
 
@@ -42,6 +44,8 @@ private:
   void _handleInput(void);
   void _updateDeltaTime(void);
   void _displayUI(Water& water, Environment& environment, char* fpsText);
+  void _loadSettings(Water& water, Environment& environment);
+  void _saveSettings(const Water& water, const Environment& environment);
 
 public:
   class WindowInitFailedException : std::exception {
