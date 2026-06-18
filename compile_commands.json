@@ -8,12 +8,12 @@
       "-I",
       "./lib",
       "-c",
+      "ext/glad/glad.c",
       "-o",
-      "ext/glad/glad.o",
-      "ext/glad/glad.c"
+      "obj/ext/glad/glad.o"
     ],
-    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
-    "output": "ext/glad/glad.o"
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/ext/glad/glad.o"
   },
   {
     "file": "ext/imgui/imgui_draw.cpp",
@@ -24,18 +24,18 @@
       "-Wpedantic",
       "-O0",
       "-g",
-      "-std=c++23",
+      "-std=c++17",
       "-I",
       "./inc",
       "-I",
       "./lib",
       "-c",
+      "ext/imgui/imgui_draw.cpp",
       "-o",
-      "ext/imgui/imgui_draw.o",
-      "ext/imgui/imgui_draw.cpp"
+      "obj/ext/imgui/imgui_draw.o"
     ],
-    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
-    "output": "ext/imgui/imgui_draw.o"
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/ext/imgui/imgui_draw.o"
   },
   {
     "file": "ext/imgui/imgui_impl_glfw.cpp",
@@ -46,18 +46,18 @@
       "-Wpedantic",
       "-O0",
       "-g",
-      "-std=c++23",
+      "-std=c++17",
       "-I",
       "./inc",
       "-I",
       "./lib",
       "-c",
+      "ext/imgui/imgui_impl_glfw.cpp",
       "-o",
-      "ext/imgui/imgui_impl_glfw.o",
-      "ext/imgui/imgui_impl_glfw.cpp"
+      "obj/ext/imgui/imgui_impl_glfw.o"
     ],
-    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
-    "output": "ext/imgui/imgui_impl_glfw.o"
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/ext/imgui/imgui_impl_glfw.o"
   },
   {
     "file": "ext/imgui/imgui_impl_opengl3.cpp",
@@ -68,18 +68,18 @@
       "-Wpedantic",
       "-O0",
       "-g",
-      "-std=c++23",
+      "-std=c++17",
       "-I",
       "./inc",
       "-I",
       "./lib",
       "-c",
+      "ext/imgui/imgui_impl_opengl3.cpp",
       "-o",
-      "ext/imgui/imgui_impl_opengl3.o",
-      "ext/imgui/imgui_impl_opengl3.cpp"
+      "obj/ext/imgui/imgui_impl_opengl3.o"
     ],
-    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
-    "output": "ext/imgui/imgui_impl_opengl3.o"
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/ext/imgui/imgui_impl_opengl3.o"
   },
   {
     "file": "ext/imgui/imgui_tables.cpp",
@@ -90,18 +90,18 @@
       "-Wpedantic",
       "-O0",
       "-g",
-      "-std=c++23",
+      "-std=c++17",
       "-I",
       "./inc",
       "-I",
       "./lib",
       "-c",
+      "ext/imgui/imgui_tables.cpp",
       "-o",
-      "ext/imgui/imgui_tables.o",
-      "ext/imgui/imgui_tables.cpp"
+      "obj/ext/imgui/imgui_tables.o"
     ],
-    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
-    "output": "ext/imgui/imgui_tables.o"
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/ext/imgui/imgui_tables.o"
   },
   {
     "file": "ext/imgui/imgui_widgets.cpp",
@@ -112,18 +112,18 @@
       "-Wpedantic",
       "-O0",
       "-g",
-      "-std=c++23",
+      "-std=c++17",
       "-I",
       "./inc",
       "-I",
       "./lib",
       "-c",
+      "ext/imgui/imgui_widgets.cpp",
       "-o",
-      "ext/imgui/imgui_widgets.o",
-      "ext/imgui/imgui_widgets.cpp"
+      "obj/ext/imgui/imgui_widgets.o"
     ],
-    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
-    "output": "ext/imgui/imgui_widgets.o"
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/ext/imgui/imgui_widgets.o"
   },
   {
     "file": "ext/imgui/imgui.cpp",
@@ -134,18 +134,18 @@
       "-Wpedantic",
       "-O0",
       "-g",
-      "-std=c++23",
+      "-std=c++17",
       "-I",
       "./inc",
       "-I",
       "./lib",
       "-c",
+      "ext/imgui/imgui.cpp",
       "-o",
-      "ext/imgui/imgui.o",
-      "ext/imgui/imgui.cpp"
+      "obj/ext/imgui/imgui.o"
     ],
-    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
-    "output": "ext/imgui/imgui.o"
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/ext/imgui/imgui.o"
   },
   {
     "file": "ext/stb/stb_image.cpp",
@@ -156,18 +156,18 @@
       "-Wpedantic",
       "-O0",
       "-g",
-      "-std=c++23",
+      "-std=c++17",
       "-I",
       "./inc",
       "-I",
       "./lib",
       "-c",
+      "ext/stb/stb_image.cpp",
       "-o",
-      "ext/stb/stb_image.o",
-      "ext/stb/stb_image.cpp"
+      "obj/ext/stb/stb_image.o"
     ],
-    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
-    "output": "ext/stb/stb_image.o"
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/ext/stb/stb_image.o"
   },
   {
     "file": "src/components/Camera.cpp",
@@ -178,21 +178,21 @@
       "-Wpedantic",
       "-O0",
       "-g",
-      "-std=c++23",
+      "-std=c++17",
       "-I",
       "./inc",
       "-I",
       "./lib",
       "-c",
+      "src/components/Camera.cpp",
       "-o",
-      "src/components/Camera.o",
-      "src/components/Camera.cpp"
+      "obj/src/components/Camera.o"
     ],
-    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
-    "output": "src/components/Camera.o"
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/src/components/Camera.o"
   },
   {
-    "file": "src/components/Water.cpp",
+    "file": "src/components/CubeMap.cpp",
     "arguments": [
       "/usr/bin/g++",
       "-Wall",
@@ -200,18 +200,40 @@
       "-Wpedantic",
       "-O0",
       "-g",
-      "-std=c++23",
+      "-std=c++17",
       "-I",
       "./inc",
       "-I",
       "./lib",
       "-c",
+      "src/components/CubeMap.cpp",
       "-o",
-      "src/components/Water.o",
-      "src/components/Water.cpp"
+      "obj/src/components/CubeMap.o"
     ],
-    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
-    "output": "src/components/Water.o"
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/src/components/CubeMap.o"
+  },
+  {
+    "file": "src/components/Environment.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-O0",
+      "-g",
+      "-std=c++17",
+      "-I",
+      "./inc",
+      "-I",
+      "./lib",
+      "-c",
+      "src/components/Environment.cpp",
+      "-o",
+      "obj/src/components/Environment.o"
+    ],
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/src/components/Environment.o"
   },
   {
     "file": "src/components/Interface.cpp",
@@ -222,18 +244,40 @@
       "-Wpedantic",
       "-O0",
       "-g",
-      "-std=c++23",
+      "-std=c++17",
       "-I",
       "./inc",
       "-I",
       "./lib",
       "-c",
+      "src/components/Interface.cpp",
       "-o",
-      "src/components/Interface.o",
-      "src/components/Interface.cpp"
+      "obj/src/components/Interface.o"
     ],
-    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
-    "output": "src/components/Interface.o"
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/src/components/Interface.o"
+  },
+  {
+    "file": "src/components/Water.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-O0",
+      "-g",
+      "-std=c++17",
+      "-I",
+      "./inc",
+      "-I",
+      "./lib",
+      "-c",
+      "src/components/Water.cpp",
+      "-o",
+      "obj/src/components/Water.o"
+    ],
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/src/components/Water.o"
   },
   {
     "file": "src/core/objects/EBO.cpp",
@@ -244,18 +288,62 @@
       "-Wpedantic",
       "-O0",
       "-g",
-      "-std=c++23",
+      "-std=c++17",
       "-I",
       "./inc",
       "-I",
       "./lib",
       "-c",
+      "src/core/objects/EBO.cpp",
       "-o",
-      "src/core/objects/EBO.o",
-      "src/core/objects/EBO.cpp"
+      "obj/src/core/objects/EBO.o"
     ],
-    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
-    "output": "src/core/objects/EBO.o"
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/src/core/objects/EBO.o"
+  },
+  {
+    "file": "src/core/objects/FBO.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-O0",
+      "-g",
+      "-std=c++17",
+      "-I",
+      "./inc",
+      "-I",
+      "./lib",
+      "-c",
+      "src/core/objects/FBO.cpp",
+      "-o",
+      "obj/src/core/objects/FBO.o"
+    ],
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/src/core/objects/FBO.o"
+  },
+  {
+    "file": "src/core/objects/RBO.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-O0",
+      "-g",
+      "-std=c++17",
+      "-I",
+      "./inc",
+      "-I",
+      "./lib",
+      "-c",
+      "src/core/objects/RBO.cpp",
+      "-o",
+      "obj/src/core/objects/RBO.o"
+    ],
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/src/core/objects/RBO.o"
   },
   {
     "file": "src/core/objects/VAO.cpp",
@@ -266,18 +354,18 @@
       "-Wpedantic",
       "-O0",
       "-g",
-      "-std=c++23",
+      "-std=c++17",
       "-I",
       "./inc",
       "-I",
       "./lib",
       "-c",
+      "src/core/objects/VAO.cpp",
       "-o",
-      "src/core/objects/VAO.o",
-      "src/core/objects/VAO.cpp"
+      "obj/src/core/objects/VAO.o"
     ],
-    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
-    "output": "src/core/objects/VAO.o"
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/src/core/objects/VAO.o"
   },
   {
     "file": "src/core/objects/VBO.cpp",
@@ -288,18 +376,18 @@
       "-Wpedantic",
       "-O0",
       "-g",
-      "-std=c++23",
+      "-std=c++17",
       "-I",
       "./inc",
       "-I",
       "./lib",
       "-c",
+      "src/core/objects/VBO.cpp",
       "-o",
-      "src/core/objects/VBO.o",
-      "src/core/objects/VBO.cpp"
+      "obj/src/core/objects/VBO.o"
     ],
-    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
-    "output": "src/core/objects/VBO.o"
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/src/core/objects/VBO.o"
   },
   {
     "file": "src/core/Engine.cpp",
@@ -310,18 +398,18 @@
       "-Wpedantic",
       "-O0",
       "-g",
-      "-std=c++23",
+      "-std=c++17",
       "-I",
       "./inc",
       "-I",
       "./lib",
       "-c",
+      "src/core/Engine.cpp",
       "-o",
-      "src/core/Engine.o",
-      "src/core/Engine.cpp"
+      "obj/src/core/Engine.o"
     ],
-    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
-    "output": "src/core/Engine.o"
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/src/core/Engine.o"
   },
   {
     "file": "src/core/Shader.cpp",
@@ -332,18 +420,18 @@
       "-Wpedantic",
       "-O0",
       "-g",
-      "-std=c++23",
+      "-std=c++17",
       "-I",
       "./inc",
       "-I",
       "./lib",
       "-c",
+      "src/core/Shader.cpp",
       "-o",
-      "src/core/Shader.o",
-      "src/core/Shader.cpp"
+      "obj/src/core/Shader.o"
     ],
-    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
-    "output": "src/core/Shader.o"
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/src/core/Shader.o"
   },
   {
     "file": "src/core/Texture.cpp",
@@ -354,18 +442,18 @@
       "-Wpedantic",
       "-O0",
       "-g",
-      "-std=c++23",
+      "-std=c++17",
       "-I",
       "./inc",
       "-I",
       "./lib",
       "-c",
+      "src/core/Texture.cpp",
       "-o",
-      "src/core/Texture.o",
-      "src/core/Texture.cpp"
+      "obj/src/core/Texture.o"
     ],
-    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
-    "output": "src/core/Texture.o"
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/src/core/Texture.o"
   },
   {
     "file": "src/core/Window.cpp",
@@ -376,18 +464,84 @@
       "-Wpedantic",
       "-O0",
       "-g",
-      "-std=c++23",
+      "-std=c++17",
       "-I",
       "./inc",
       "-I",
       "./lib",
       "-c",
+      "src/core/Window.cpp",
       "-o",
-      "src/core/Window.o",
-      "src/core/Window.cpp"
+      "obj/src/core/Window.o"
     ],
-    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
-    "output": "src/core/Window.o"
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/src/core/Window.o"
+  },
+  {
+    "file": "src/effects/Fog.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-O0",
+      "-g",
+      "-std=c++17",
+      "-I",
+      "./inc",
+      "-I",
+      "./lib",
+      "-c",
+      "src/effects/Fog.cpp",
+      "-o",
+      "obj/src/effects/Fog.o"
+    ],
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/src/effects/Fog.o"
+  },
+  {
+    "file": "src/settings/SettingsData.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-O0",
+      "-g",
+      "-std=c++17",
+      "-I",
+      "./inc",
+      "-I",
+      "./lib",
+      "-c",
+      "src/settings/SettingsData.cpp",
+      "-o",
+      "obj/src/settings/SettingsData.o"
+    ],
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/src/settings/SettingsData.o"
+  },
+  {
+    "file": "src/settings/SettingsManager.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-O0",
+      "-g",
+      "-std=c++17",
+      "-I",
+      "./inc",
+      "-I",
+      "./lib",
+      "-c",
+      "src/settings/SettingsManager.cpp",
+      "-o",
+      "obj/src/settings/SettingsManager.o"
+    ],
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/src/settings/SettingsManager.o"
   },
   {
     "file": "src/main.cpp",
@@ -398,17 +552,17 @@
       "-Wpedantic",
       "-O0",
       "-g",
-      "-std=c++23",
+      "-std=c++17",
       "-I",
       "./inc",
       "-I",
       "./lib",
       "-c",
+      "src/main.cpp",
       "-o",
-      "src/main.o",
-      "src/main.cpp"
+      "obj/src/main.o"
     ],
-    "directory": "/home/mrakoton/Repositories/Mini-Projects/water-simulation",
-    "output": "src/main.o"
+    "directory": "/home/mrakoton/Repositories/Project/water-simulation",
+    "output": "obj/src/main.o"
   }
 ]

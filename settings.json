@@ -1,0 +1,53 @@
+{
+    "ambientColor": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "ambientStrength": 0.30000001192092896,
+    "amplitude": 3.0,
+    "amplitudeMult": 0.8100000023841858,
+    "drag": 2.0999999046325684,
+    "enableFog": true,
+    "fogColor": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "fogFar": 1000.0,
+    "fogNear": 0.10000000149011612,
+    "fogOffset": 500.0,
+    "fogSteepness": 0.009999999776482582,
+    "frequency": 0.05999999865889549,
+    "frequencyMult": 1.128999948501587,
+    "iterationMult": 1.1799999475479126,
+    "iterations": 32,
+    "lightColor": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "lightDirection": [
+        -0.28700000047683716,
+        -0.3050000071525574,
+        -1.0
+    ],
+    "peakMax": 1.0,
+    "peakOffset": 1.0,
+    "shininess": 256,
+    "skyColor": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "specularStrength": 1.0,
+    "speed": 2.0199999809265137,
+    "speedMult": 1.0700000524520874,
+    "sunBrightness": 2.0,
+    "sunSize": 0.9990000128746033,
+    "waterColor": [
+        0.29738563299179077,
+        0.4151288568973541,
+        0.5833333730697632
+    ]
+}

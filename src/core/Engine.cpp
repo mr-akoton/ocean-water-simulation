@@ -1,6 +1,10 @@
-#include "glm/gtc/type_ptr.hpp"
+#include "components/Environment.hpp"
 #include "imgui/imgui.h"
+#include "settings/SettingsManager.hpp"
 #include <core/Engine.hpp>
+#include <iostream>
+#include <ostream>
+#include <settings/SettingsData.hpp>
 
 using namespace glm;
 
@@ -8,14 +12,9 @@ using namespace glm;
 /*                         CONSTRUCTOR AND DESTRUCTOR                         */
 /* ========================================================================== */
 
-constexpr int WINDOW_WIDTH = 1280;
-constexpr int WINDOW_HEIGHT = 720;
-constexpr const char* WINDOW_TITLE = "OpenGL - Water";
-
 Engine::Engine(void)
     : camera(WINDOW_WIDTH, WINDOW_HEIGHT, vec3(250.0f, 150.0f, -100.0f)),
-      _lastFrame(0.0f), _deltaTime(0.0f), _frameCount(0) {
-
+      _isUIEnable(false), _lastFrame(0.0f), _deltaTime(0.0f), _frameCount(0) {
   _initGLFW();
   if (window.init(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE) == -1) {
     glfwTerminate();
@@ -26,6 +25,8 @@ Engine::Engine(void)
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
+
+  glDepthFunc(GL_LESS);
 }
 
 Engine::~Engine() {
@@ -59,13 +60,17 @@ void Engine::_initGLAD(void) const {
 /* ========================================================================== */
 
 void Engine::run(void) {
-  Water water(500, 500);
-  water.init(vec3(0.172f, 0.3412f, 0.4667f));
+  Water water(1000, 1000);
+  water.init();
 
-  vec3 lightDirection(-0.2f, -0.8f, -1.0f);
-  vec3 lightColor(1.0f, 1.0f, 1.0f);
+  Environment environment;
+  CubeMap& skybox = environment.skybox;
+  vec3 skyColor = environment.skyColor;
+
+  _loadSettings(water, environment);
 
   float lastTime = glfwGetTime();
+  double ms = 0.0;
   char fpsText[100] = "Debug: 0 ms/frame";
 
   while (not window.shouldClose()) {
@@ -75,48 +80,44 @@ void Engine::run(void) {
 
     _frameCount++;
     if (glfwGetTime() - lastTime >= 1.0f) {
-      sprintf(fpsText, "Debug: %f ms/frame", 1000.0 / double(_frameCount));
+      sprintf(fpsText, "Debug: %.2f ms/frame\nWater Render: %.2f ms/frame",
+              1000.0 / double(_frameCount), ms);
       _frameCount = 0;
       lastTime += 1.0f;
     }
 
-    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+    environment.attach();
+    glClearColor(skyColor.x, skyColor.y, skyColor.z, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    camera.updateMatrix(45.0f, 0.1f, 1000.0f);
+    camera.updateMatrix(CAMERA_FOV, CAMERA_NEAR, CAMERA_FAR);
 
     if (not interface.wantCaptureMouse()) {
       camera.handleInput(window, _deltaTime);
     }
 
-    water.render(camera, lightDirection, lightColor);
+    // Isolate water rendering //
+    GLuint queries[2];
+    glGenQueries(2, queries);
 
-    interface.createFrame();
-    ImGui::Begin("Setting");
+    glQueryCounter(queries[0], GL_TIMESTAMP);
+    water.render(camera, environment);
+    glQueryCounter(queries[1], GL_TIMESTAMP);
 
-    ImGui::Text("%s", fpsText);
+    GLuint64 t0, t1;
+    glGetQueryObjectui64v(queries[0], GL_QUERY_RESULT, &t0);
+    glGetQueryObjectui64v(queries[1], GL_QUERY_RESULT, &t1);
 
-    ImGui::Text("Water");
-    ImGui::InputInt("Iteration", &water.iteration);
-    ImGui::InputFloat("Amplitude", &water.amplitude);
-    ImGui::InputFloat("Frequence", &water.frequency);
-    ImGui::SliderFloat("Speed", &water.speed, 0.0, 10.0, "%.2f");
-    ImGui::SliderFloat("Drag", &water.drag, -10.0, 10.0, "%.2f");
-    ImGui::InputFloat("Peak Max", &water.peakMax);
-    ImGui::InputFloat("Peak Offset", &water.peakOffset);
+    ms = (t1 - t0) / 1e6;
+    // *********************** //
 
-    ImGui::InputFloat("Amplitude Multiplier", &water.amplitudeMult);
-    ImGui::InputFloat("Frequency Multiplier", &water.frequencyMult);
-    ImGui::InputFloat("Speed Multiplier", &water.speedMult);
-    ImGui::InputFloat("Iteration Multiplier", &water.iterationMult);
+    skybox.render(camera, environment);
 
-    ImGui::Text("Light");
-    ImGui::SliderFloat3("Direction", value_ptr(lightDirection), -1, 1, "%.3f");
-    ImGui::ColorEdit3("Color", value_ptr(lightColor));
+    environment.detach();
+    environment.render(camera);
 
-    ImGui::End();
-    interface.render();
-
+    if (_isUIEnable) {
+      _displayUI(water, environment, fpsText);
+    }
     window.update();
   }
 }
@@ -125,9 +126,163 @@ void Engine::run(void) {
 /*                                    INPUT                                   */
 /* ========================================================================== */
 
-void Engine::_handleInput(void) const {
+void Engine::_handleInput(void) {
   if (window.isKeyPressed(GLFW_KEY_ESCAPE)) {
     window.close();
+  }
+  if (window.isKeyJustPressed(GLFW_KEY_T)) {
+    _isUIEnable = not _isUIEnable;
+  }
+}
+
+void Engine::_displayUI(Water& water, Environment& environment, char* fpsText) {
+  interface.createFrame();
+  ImGui::Begin("Setting");
+
+  ImGui::TextUnformatted(fpsText);
+  if (ImGui::Button("Save")) {
+    _saveSettings(water, environment);
+  }
+
+  ImGui::Separator();
+
+  if (ImGui::CollapsingHeader("Water", ImGuiTreeNodeFlags_DefaultOpen)) {
+    ImGui::ColorEdit3("Water Color", value_ptr(water.color));
+
+    ImGui::DragInt("Iterations", &water.iteration, 1, 1, MAX_WAVE_ITERATION);
+
+    ImGui::SliderFloat("Amplitude", &water.amplitude, 0.0f, 20.0f, "%.2f");
+    ImGui::SliderFloat("Frequency", &water.frequency, 0.0f, 1.0f, "%.3f");
+    ImGui::SliderFloat("Speed", &water.speed, 0.0f, 10.0f, "%.2f");
+    ImGui::SliderFloat("Drag", &water.drag, 0.0f, 5.0f, "%.2f");
+
+    ImGui::SeparatorText("Wave Shaping");
+    ImGui::InputFloat("Peak Max", &water.peakMax);
+    ImGui::InputFloat("Peak Offset", &water.peakOffset);
+
+    ImGui::SeparatorText("Multipliers");
+    ImGui::DragFloat("Amplitude Mult", &water.amplitudeMult, 0.01f, 0.0f,
+                     10.0f);
+    ImGui::DragFloat("Frequency Mult", &water.frequencyMult, 0.01f, 0.0f,
+                     10.0f);
+    ImGui::DragFloat("Speed Mult", &water.speedMult, 0.01f, 0.0f, 10.0f);
+
+    ImGui::SeparatorText("Materials");
+    ImGui::ColorEdit3("Ambient Color", value_ptr(water.ambientColor));
+    ImGui::SliderFloat("Ambient Strength", &water.ambientStrength, 0.0f, 1.0f,
+                       "%.2f");
+    ImGui::SliderFloat("Specular Strength", &water.specularStrength, 0.0f, 1.0f,
+                       "%.2f");
+    ImGui::InputInt("Shininess", &water.shininess);
+  }
+
+  if (ImGui::CollapsingHeader("Lighting")) {
+    ImGui::ColorEdit3("Sky Color", value_ptr(environment.skyColor));
+    ImGui::ColorEdit3("Light Color", value_ptr(environment.lightColor));
+    ImGui::SliderFloat3("Direction", value_ptr(environment.lightDirection),
+                        -1.0f, 1.0f);
+
+    ImGui::Separator();
+    ImGui::DragFloat("Sun Size", &environment.skybox.sunSize, 0.01f, 0.0f,
+                     100.0f);
+    ImGui::DragFloat("Sun Brightness", &environment.skybox.sunBrightness, 0.01f,
+                     0.0f, 10.0f);
+  }
+
+  if (ImGui::CollapsingHeader("Fog")) {
+    ImGui::Checkbox("Enable Fog", &environment.fog.enabled);
+    ImGui::ColorEdit3("Fog Color", value_ptr(environment.fog.color));
+
+    ImGui::DragFloat("Fog Near", &environment.fog.near, 0.1f, 0.0f, 1000.0f);
+    ImGui::DragFloat("Fog Far", &environment.fog.far, 0.1f, 0.0f, 5000.0f);
+
+    ImGui::InputFloat("Fog Steepness", &environment.fog.steepness);
+    ImGui::InputFloat("Fog Offset", &environment.fog.offset);
+  }
+
+  ImGui::End();
+  interface.render();
+}
+
+/* ========================================================================== */
+/*                                   SETTINGS                                 */
+/* ========================================================================== */
+
+void Engine::_loadSettings(Water& water, Environment& environment) {
+  setting::data settings;
+
+  if (SettingsManager::load("settings.json", settings) == false) {
+    std::cerr << "Warning: failed to load settings.json.\nDefault settings are "
+                 "applied instead."
+              << std::endl;
+  }
+
+  water.iteration = settings.iteration;
+  water.amplitude = settings.amplitude;
+  water.frequency = settings.frequency;
+  water.speed = settings.speed;
+  water.drag = settings.drag;
+  water.peakMax = settings.peakMax;
+  water.peakOffset = settings.peakOffset;
+  water.amplitudeMult = settings.amplitudeMult;
+  water.frequencyMult = settings.frequencyMult;
+  water.speedMult = settings.speedMult;
+  water.iterationMult = settings.iterationMult;
+  water.ambientColor = settings.ambientColor;
+  water.color = settings.waterColor;
+  water.ambientStrength = settings.ambientStrength;
+  water.specularStrength = settings.specularStrength;
+  water.shininess = settings.shininess;
+
+  environment.fog.enabled = settings.enableFog;
+  environment.fog.color = settings.fogColor;
+  environment.fog.far = settings.fogFar;
+  environment.fog.near = settings.fogNear;
+  environment.fog.offset = settings.fogOffset;
+  environment.fog.steepness = settings.fogSteepness;
+  environment.skybox.sunBrightness = settings.sunBrightness;
+  environment.skybox.sunSize = settings.sunSize;
+  environment.skyColor = settings.skyColor;
+  environment.lightDirection = settings.lightDirection;
+  environment.lightColor = settings.lightColor;
+}
+
+void Engine::_saveSettings(const Water& water, const Environment& environment) {
+  setting::data settings;
+
+  settings.iteration = water.iteration;
+  settings.amplitude = water.amplitude;
+  settings.frequency = water.frequency;
+  settings.speed = water.speed;
+  settings.drag = water.drag;
+  settings.peakMax = water.peakMax;
+  settings.peakOffset = water.peakOffset;
+  settings.amplitudeMult = water.amplitudeMult;
+  settings.frequencyMult = water.frequencyMult;
+  settings.speedMult = water.speedMult;
+  settings.iterationMult = water.iterationMult;
+  settings.ambientColor = water.ambientColor;
+  settings.waterColor = water.color;
+  settings.ambientStrength = water.ambientStrength;
+  settings.specularStrength = water.specularStrength;
+  settings.shininess = water.shininess;
+
+  settings.enableFog = environment.fog.enabled;
+  settings.fogColor = environment.fog.color;
+  settings.fogFar = environment.fog.far;
+  settings.fogNear = environment.fog.near;
+  settings.fogOffset = environment.fog.offset;
+  settings.fogSteepness = environment.fog.steepness;
+  settings.sunBrightness = environment.skybox.sunBrightness;
+  settings.sunSize = environment.skybox.sunSize;
+  settings.skyColor = environment.skyColor;
+  settings.lightDirection = environment.lightDirection;
+  settings.lightColor = environment.lightColor;
+
+  if (SettingsManager::save("settings.json", settings) == false) {
+    std::cerr << "Error: failed to save your settings.\n." << std::endl;
+  } else {
+    std::cout << "Settings successfully saved !" << std::endl;
   }
 }
 

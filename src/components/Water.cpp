@@ -1,7 +1,8 @@
 #include <components/Water.hpp>
+#include <settings/SettingsData.hpp>
 
-constexpr const char* VERTEX_SHADER = "shader/water-vertex.glsl";
-constexpr const char* FRAGMENT_SHADER = "shader/water-fragment.glsl";
+static const char* VERTEX_SHADER = "shader/water-vertex.glsl";
+static const char* FRAGMENT_SHADER = "shader/water-fragment.glsl";
 
 using namespace glm;
 
@@ -9,14 +10,33 @@ using namespace glm;
 /*                         CONSTRUCTOR AND DESTRUCTOR                         */
 /* ========================================================================== */
 
-Water::Water(unsigned int width, unsigned int height, float gridSize,
-             vec3 position)
+Water::Water(unsigned int width, unsigned int height, float gridSize)
     : width(width), height(height), gridSize(gridSize), iteration(32),
-      amplitude(13.0), frequency(0.02), speed(2.0), drag(1.4), peakMax(1.0),
+      amplitude(8.0), frequency(0.02), speed(1.4), drag(1.4), peakMax(1.0),
       peakOffset(1.0), amplitudeMult(0.82), frequencyMult(1.18),
-      speedMult(1.07), iterationMult(1232.399963), position(position),
-      model(1.0f), shader(VERTEX_SHADER, FRAGMENT_SHADER) {
+      speedMult(1.07), iterationMult(1.18), ambientColor(1.0f),
+      ambientStrength(0.4), specularStrength(1.0), shininess(256),
+      position(0.0f), color(0.629f, 0.883f, 0.917f), model(1.0f), imodel(1.0f),
+      shader(VERTEX_SHADER, FRAGMENT_SHADER), _indicesCount(0) {
   model = translate(model, position);
+  imodel = transpose(inverse(mat3(model)));
+
+  float iter = 0.0f;
+  for (int i = 0; i < MAX_WAVE_ITERATION; i++) {
+    waveDirections.push_back(normalize(vec2(std::cos(iter), std::sin(iter))));
+    iter += iterationMult;
+  }
+
+  glGenTextures(1, &_directionTexture);
+  glBindTexture(GL_TEXTURE_1D, _directionTexture);
+  glTexImage1D(GL_TEXTURE_1D, 0, GL_RG32F, MAX_WAVE_ITERATION, 0, GL_RG,
+               GL_FLOAT, waveDirections.data());
+  glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+  shader.enable();
+  shader.setInt("u_skybox", 0);
+  shader.setInt("u_directionTexture", 1);
 }
 
 Water::~Water() {}
@@ -25,13 +45,10 @@ Water::~Water() {}
 /*                                    INIT                                    */
 /* ========================================================================== */
 
-void Water::init(vec3 color) {
+void Water::init() {
   for (unsigned int z = 0; z < height; z++) {
     for (unsigned int x = 0; x < width; x++) {
-      Vertex vertex;
-      vertex.position = vec3((float)x * gridSize, 0.0f, (float)z * gridSize);
-      vertex.color = color;
-      _vertices.push_back(vertex);
+      _vertices.push_back(vec2((float)x * gridSize, (float)z * gridSize));
 
       if (x != width - 1 and z != height - 1) {
         unsigned int i = (z * width) + x;
@@ -47,35 +64,40 @@ void Water::init(vec3 color) {
     }
   }
 
-  _vao.bind();
-  VBO vbo(_vertices);
-  vbo.bind();
-  EBO ebo(_indices);
-  ebo.bind();
+  _indicesCount = _indices.size();
 
-  _vao.linkAttribute(vbo, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)(0));
-  _vao.linkAttribute(vbo, 1, 3, GL_FLOAT, sizeof(Vertex),
-                     (void*)(3 * sizeof(float)));
+  _vao.bind();
+  _vbo.bindData(_vertices);
+  _vbo.bind();
+  _ebo.bindData(_indices);
+  _ebo.bind();
+
+  _vao.linkAttribute(_vbo, 0, 2, GL_FLOAT, sizeof(glm::vec2), (void*)(0));
 
   _vao.unbind();
-  vbo.unbind();
-  ebo.unbind();
+  _vbo.unbind();
+  _ebo.unbind();
+
+  _vertices.clear();
+  _vertices.shrink_to_fit();
+  _indices.clear();
+  _indices.shrink_to_fit();
 }
 
 /* ========================================================================== */
 /*                                   UPDATE                                   */
 /* ========================================================================== */
 
-void Water::render(Camera& camera, const vec3 lightDirection,
-                   const vec3 lightColor) const {
+void Water::render(Camera& camera, Environment& environment) const {
   _vao.bind();
 
   shader.enable();
   camera.updateShaderMatrix(shader, "u_projection");
+  shader.setVec3("u_color", color);
   shader.setMat4("u_model", model);
-  shader.setMat3("u_imodel", transpose(inverse(mat3(model))));
-  shader.setVec3("u_lightDirection", lightDirection);
-  shader.setVec3("u_lightColor", lightColor);
+  shader.setMat3("u_imodel", imodel);
+  shader.setVec3("u_lightDirection", environment.lightDirection);
+  shader.setVec3("u_lightColor", environment.lightColor);
   shader.setVec3("u_viewPosition", camera.position);
 
   shader.setInt("u_waveIteration", iteration);
@@ -89,9 +111,15 @@ void Water::render(Camera& camera, const vec3 lightDirection,
   shader.setFloat("u_amplitudeMult", amplitudeMult);
   shader.setFloat("u_frequencyMult", frequencyMult);
   shader.setFloat("u_speedMult", speedMult);
-  shader.setFloat("u_iterationMult", iterationMult);
+
+  shader.setFloat("u_ambientStrength", ambientStrength);
+  shader.setVec3("u_ambientColor", ambientColor);
+  shader.setFloat("u_specularStrength", specularStrength);
+  shader.setInt("u_shininess", shininess);
 
   shader.setFloat("u_time", glfwGetTime());
 
-  glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, 0);
+  glBindTexture(GL_TEXTURE_1D, _directionTexture);
+
+  glDrawElements(GL_TRIANGLES, _indicesCount, GL_UNSIGNED_INT, 0);
 }

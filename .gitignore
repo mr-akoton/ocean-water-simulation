@@ -2,6 +2,7 @@
 .cache
 draft.tldr
 
+obj
 *.o
 *.zip
 *.tar.gz
