@@ -1,16 +1,17 @@
 #version 330 core
 
-layout(location = 0) in vec3 in_position;
-layout(location = 1) in vec3 in_color;
+layout(location = 0) in vec2 in_position;
 
 #define PI 3.14159265359
 
 uniform mat4 u_projection;
+uniform vec3 u_viewPosition;
 uniform vec3 u_color;
 uniform mat4 u_model;
 uniform mat3 u_imodel;
 uniform float u_time;
 
+uniform sampler1D u_directionTexture;
 uniform int u_waveIteration;
 uniform float u_amplitude;
 uniform float u_frequency;
@@ -56,7 +57,13 @@ out vec3 p_normal;
 // wave gradient (drag term) to introduce nonlinear wave interaction.
 
 vec3 getWavesFBM(vec2 position) {
-    float iteration = 0.0;
+    float distanceToCamera = length(u_viewPosition.xz - position);
+
+    // Reduce number of iteration if the vertex is far to be seen
+    int maxIter = max(4, int(float(u_waveIteration) *
+                    (1.0 - clamp(distanceToCamera / 2000.0, 0.0, 0.85))));
+
+    // float iteration = 0.0;
     float amplitude = u_amplitude;
     float frequency = u_frequency;
     float speed = u_speed;
@@ -65,9 +72,12 @@ vec3 getWavesFBM(vec2 position) {
     float height = 0.0;
     vec2 derivative = vec2(0.0);
 
-    for (int i = 0; i < u_waveIteration; i++) {
+    for (int i = 0; i < maxIter; i++) {
+        if (amplitude < 0.001) break; // Stop iteration if wave height is near 0.0
+
         // Generate arbitrary direction
-        vec2 direction = normalize(vec2(cos(iteration), sin(iteration)));
+        vec2 direction = texelFetch(u_directionTexture, i, 0).rg;
+        // vec2 direction = normalize(vec2(cos(iteration), sin(iteration)));
 
         float theta = dot(direction, position.xy) * frequency + u_time * speed;
         float sinTheta = sin(theta);
@@ -88,16 +98,16 @@ vec3 getWavesFBM(vec2 position) {
         amplitude *= u_amplitudeMult;
         frequency *= u_frequencyMult;
         speed *= u_speedMult;
-        iteration += u_iterationMult;
+        // iteration += u_iterationMult;
     }
 
     return vec3(derivative.x, height, derivative.y);
 }
 
 void main() {
-    vec3 waves = getWavesFBM(in_position.xz);
+    vec3 waves = getWavesFBM(in_position);
 
-    vec3 finalPosition = vec3(in_position.x, in_position.y + waves.y, in_position.z);
+    vec3 finalPosition = vec3(in_position.x, waves.y, in_position.y);
     vec4 worldPosition = u_model * vec4(finalPosition, 1.0);
     vec3 normal = vec3(-waves.x, 1.0, -waves.z);
 

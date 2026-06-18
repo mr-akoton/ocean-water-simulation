@@ -8,8 +8,11 @@ constexpr int WINDOW_WIDTH = 1280;
 constexpr int WINDOW_HEIGHT = 720;
 constexpr const char* WINDOW_TITLE = "OpenGL - Water";
 constexpr const char* SKYBOX_FACES[6] = {
-    "resources/right.jpg",  "resources/left.jpg",  "resources/top.jpg",
-    "resources/bottom.jpg", "resources/front.jpg", "resources/back.jpg"};
+    "resources/right.png",  "resources/left.png",  "resources/top.png",
+    "resources/bottom.png", "resources/front.png", "resources/back.png"};
+
+// Cap it to this value because my PC is potato :v
+constexpr const int MAX_WAVE_ITERATION = 64;
 
 constexpr float CAMERA_FOV = 60.0f;
 constexpr float CAMERA_NEAR = 0.1f;

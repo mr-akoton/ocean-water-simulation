@@ -3,6 +3,9 @@
 #include <settings/SettingsData.hpp>
 #include <iostream>
 
+static const char* VERTEX_SHADER = "shader/postpro-vertex.glsl";
+static const char* FRAGMENT_SHADER = "shader/postpro-fragment.glsl";
+
 const std::vector<glm::vec4> Environment::_vertices{
     {-1.0f, -1.0f, 0.0f, 0.0f}, // 1
     {+1.0f, -1.0f, 1.0f, 0.0f}, // 2
@@ -17,7 +20,7 @@ const std::vector<glm::vec4> Environment::_vertices{
 /* ========================================================================== */
 
 Environment::Environment(void)
-    : shader("shader/postpro-vertex.glsl", "shader/postpro-fragment.glsl"),
+    : shader(VERTEX_SHADER, FRAGMENT_SHADER),
       skybox((const char**)SKYBOX_FACES), skyColor(0.0f),
       lightDirection(-0.2f, -0.2f, -1.0f), lightColor(1.0f) {
   shader.enable();
@@ -94,7 +97,9 @@ void Environment::render(Camera& camera) {
   shader.setFloat("u_fogOffset", fog.offset);
   shader.setVec3("u_fogColor", fog.color);
 
+  glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, _colorTexture);
+  glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, _depthTexture);
 
   glDrawArrays(GL_TRIANGLES, 0, 6);

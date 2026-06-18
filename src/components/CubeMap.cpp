@@ -3,11 +3,15 @@
 #include <settings/SettingsData.hpp>
 #include <iostream>
 
+static const char* VERTEX_SHADER = "shader/skybox-vertex.glsl";
+static const char* FRAGMENT_SHADER = "shader/skybox-fragment.glsl";
+
 const std::vector<glm::vec3> CubeMap::_vertices{
     {-1.0f, -1.0f, +1.0f}, {+1.0f, -1.0f, +1.0f}, {+1.0f, -1.0f, -1.0f},
     {-1.0f, -1.0f, -1.0f}, {-1.0f, +1.0f, +1.0f}, {+1.0f, +1.0f, +1.0f},
     {+1.0f, +1.0f, -1.0f}, {-1.0f, +1.0f, -1.0f},
 };
+
 const std::vector<GLuint> CubeMap::_indices{
     1, 2, 6, 6, 5, 1, // Right
     0, 4, 7, 7, 3, 0, // Left
@@ -23,8 +27,7 @@ const std::vector<GLuint> CubeMap::_indices{
 
 CubeMap::CubeMap(const char* textures[6])
     : _vao(), _vbo(this->_vertices), _ebo(this->_indices), sunSize(0.999f),
-      sunBrightness(1.5f),
-      shader("shader/skybox-vertex.glsl", "shader/skybox-fragment.glsl") {
+      sunBrightness(1.5f), shader(VERTEX_SHADER, FRAGMENT_SHADER) {
   _vao.bind();
   _ebo.bind();
   _vao.linkAttribute(_vbo, 0, 3, GL_FLOAT, sizeof(glm::vec3), (void*)0);
@@ -42,11 +45,16 @@ CubeMap::CubeMap(const char* textures[6])
   for (unsigned int i = 0; i < 6; i++) {
     int width, height, nrChannels;
 
-    if (i == 0) {
-      stbi_set_flip_vertically_on_load(true);
-    } else {
-      stbi_set_flip_vertically_on_load(false);
-    }
+    /**
+     * NOTE: Uncomment this code if one of the texture is flipped. You may have
+     * to target on or more faces if this doesn't work. Or you ca manually flip
+     * the images with an editor.
+     */
+    //  if (i == 0) {
+    //   stbi_set_flip_vertically_on_load(true);
+    // } else {
+    //   stbi_set_flip_vertically_on_load(false);
+    // }
 
     unsigned char* data =
         stbi_load(textures[i], &width, &height, &nrChannels, 0);
@@ -61,6 +69,7 @@ CubeMap::CubeMap(const char* textures[6])
     }
   }
 
+  shader.enable();
   shader.setInt("u_skybox", 0);
   glActiveTexture(GL_TEXTURE0);
 }
@@ -96,6 +105,7 @@ void CubeMap::render(Camera& camera, Environment& environment) {
   shader.setFloat("u_sunSize", sunSize);
   shader.setFloat("u_sunBrightness", sunBrightness);
 
+  glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
   glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 

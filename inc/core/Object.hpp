@@ -44,6 +44,7 @@ private:
 public:
   VBO(void);
   VBO(const std::vector<Vertex>& vertices);
+  VBO(const std::vector<glm::vec2>& vertices);
   VBO(const std::vector<glm::vec3>& vertices);
   VBO(const std::vector<glm::vec4>& vertices);
   ~VBO();
@@ -51,6 +52,7 @@ public:
   void bind(void) const;
   void unbind(void) const;
   void bindData(const std::vector<Vertex>& vertices);
+  void bindData(const std::vector<glm::vec2>& vertices);
   void bindData(const std::vector<glm::vec3>& vertices);
   void bindData(const std::vector<glm::vec4>& vertices);
 };

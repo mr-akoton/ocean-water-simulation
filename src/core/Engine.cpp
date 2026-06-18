@@ -70,6 +70,7 @@ void Engine::run(void) {
   _loadSettings(water, environment);
 
   float lastTime = glfwGetTime();
+  double ms = 0.0;
   char fpsText[100] = "Debug: 0 ms/frame";
 
   while (not window.shouldClose()) {
@@ -79,7 +80,8 @@ void Engine::run(void) {
 
     _frameCount++;
     if (glfwGetTime() - lastTime >= 1.0f) {
-      sprintf(fpsText, "Debug: %f ms/frame", 1000.0 / double(_frameCount));
+      sprintf(fpsText, "Debug: %.2f ms/frame\nWater Render: %.2f ms/frame",
+              1000.0 / double(_frameCount), ms);
       _frameCount = 0;
       lastTime += 1.0f;
     }
@@ -93,7 +95,21 @@ void Engine::run(void) {
       camera.handleInput(window, _deltaTime);
     }
 
+    // Isolate water rendering //
+    GLuint queries[2];
+    glGenQueries(2, queries);
+
+    glQueryCounter(queries[0], GL_TIMESTAMP);
     water.render(camera, environment);
+    glQueryCounter(queries[1], GL_TIMESTAMP);
+
+    GLuint64 t0, t1;
+    glGetQueryObjectui64v(queries[0], GL_QUERY_RESULT, &t0);
+    glGetQueryObjectui64v(queries[1], GL_QUERY_RESULT, &t1);
+
+    ms = (t1 - t0) / 1e6;
+    // *********************** //
+
     skybox.render(camera, environment);
 
     environment.detach();
@@ -133,9 +149,9 @@ void Engine::_displayUI(Water& water, Environment& environment, char* fpsText) {
   if (ImGui::CollapsingHeader("Water", ImGuiTreeNodeFlags_DefaultOpen)) {
     ImGui::ColorEdit3("Water Color", value_ptr(water.color));
 
-    ImGui::DragInt("Iterations", &water.iteration, 0.1f, 1, 100);
+    ImGui::DragInt("Iterations", &water.iteration, 1, 1, MAX_WAVE_ITERATION);
 
-    ImGui::SliderFloat("Amplitude", &water.amplitude, 0.0f, 20.0f, "%.0f");
+    ImGui::SliderFloat("Amplitude", &water.amplitude, 0.0f, 20.0f, "%.2f");
     ImGui::SliderFloat("Frequency", &water.frequency, 0.0f, 1.0f, "%.3f");
     ImGui::SliderFloat("Speed", &water.speed, 0.0f, 10.0f, "%.2f");
     ImGui::SliderFloat("Drag", &water.drag, 0.0f, 5.0f, "%.2f");
@@ -150,8 +166,6 @@ void Engine::_displayUI(Water& water, Environment& environment, char* fpsText) {
     ImGui::DragFloat("Frequency Mult", &water.frequencyMult, 0.01f, 0.0f,
                      10.0f);
     ImGui::DragFloat("Speed Mult", &water.speedMult, 0.01f, 0.0f, 10.0f);
-    ImGui::DragFloat("Iteration Mult", &water.iterationMult, 0.01f, 0.0f,
-                     10.0f);
 
     ImGui::SeparatorText("Materials");
     ImGui::ColorEdit3("Ambient Color", value_ptr(water.ambientColor));
