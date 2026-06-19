@@ -2,6 +2,7 @@
 # VARIABLES
 
 NAME		:= water-simulation
+VERSION		:= 0.2.0
 
 SRC_DIR		:= ./src
 INC_DIR		:= ./inc
@@ -14,12 +15,13 @@ SHD_DIR		:= ./shader
 RES_DIR		:= ./resources
 
 SETTINGS	:= ./settings.json
+IMGUI		:= ./imgui.ini
 
 BLD_DIR		:= ./build
 SHD_DIR		:= ./shader
 RES_DIR		:= ./resources
 
-
+ARCH_NAME	:= $(NAME)-v$(VERSION)
 BUILD_TYPE	?= debug
 
 # ============================================================================ #
@@ -106,11 +108,13 @@ build:
 	@BUILD_TYPE=release make re
 	@mkdir -p $(BLD_DIR)
 	@mv $(NAME) $(BLD_DIR)
-	@cp -r $(SETTINGS) $(SHD_DIR) $(RES_DIR) $(BLD_DIR)/.
+	@cp -r $(SETTINGS) $(IMGUI) $(SHD_DIR) $(RES_DIR) $(BLD_DIR)/.
 
 archive:
-	zip -r $(NAME).zip $(BLD_DIR)
-	tar -czvf $(NAME).tar.gz $(BLD_DIR)
+	mv $(BLD_DIR) $(ARCH_NAME)
+	zip -r $(ARCH_NAME).zip $(ARCH_NAME)
+	tar -czvf $(ARCH_NAME).tar.gz $(ARCH_NAME)
+	mv $(ARCH_NAME) $(BLD_DIR)
 
 run: all
 	@./$(NAME)
