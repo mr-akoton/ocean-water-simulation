@@ -1,3 +1,4 @@
+#include "glad/glad.h"
 #include <core/Texture.hpp>
 #include <core/Engine.hpp>
 
@@ -7,29 +8,26 @@ using namespace glm;
 /*                          CONTRUCTOR AND DESTRUCTOR                         */
 /* ========================================================================== */
 
-Texture::Texture(const char* file, GLuint slot, GLenum format, GLenum pixType)
+Texture::Texture(const char* file, GLuint slot, GLenum format, GLenum inFormat,
+                 GLenum dataType)
     : _unit(slot) {
   unsigned char* bytes;
 
   stbi_set_flip_vertically_on_load(true);
   bytes = stbi_load(file, &width, &height, &channel, 0);
 
-  glGenTextures(1, &_id);
-  glActiveTexture(GL_TEXTURE0 + _unit);
-  this->bind();
+  glCreateTextures(GL_TEXTURE_2D, 1, &_id);
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTextureStorage2D(_id, 1, inFormat, width, height);
+  glTextureSubImage2D(_id, 0, 0, 0, width, height, format, dataType, bytes);
+  glGenerateTextureMipmap(_id);
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, format, pixType,
-               bytes);
-  glGenerateMipmap(GL_TEXTURE_2D);
+  glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTextureParameteri(_id, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTextureParameteri(_id, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTextureParameteri(_id, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
   stbi_image_free(bytes);
-  this->unbind();
 }
 
 Texture::~Texture() { glDeleteTextures(1, &_id); }
@@ -50,24 +48,17 @@ void Texture::unbind(void) const { glBindTexture(GL_TEXTURE_2D, 0); }
 /* ========================================================================== */
 
 void Texture::setFilter(GLuint filter) const {
-  this->bind();
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
-  this->unbind();
+  glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, filter);
+  glTextureParameteri(_id, GL_TEXTURE_MAG_FILTER, filter);
 }
 
 void Texture::setWrap(GLuint wrap) const {
-  this->bind();
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
-  this->unbind();
+  glTextureParameteri(_id, GL_TEXTURE_WRAP_S, wrap);
+  glTextureParameteri(_id, GL_TEXTURE_WRAP_T, wrap);
 }
 
 void Texture::setWrapBorderColor(vec4 color) const {
-  this->bind();
-  glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR,
-                   glm::value_ptr(color));
-  this->unbind();
+  glTextureParameterfv(_id, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(color));
 }
 
 /* ========================================================================== */
@@ -77,5 +68,6 @@ void Texture::setWrapBorderColor(vec4 color) const {
 void Texture::updateShaderTexture(Shader& shader, const std::string uniform,
                                   GLuint unit) const {
   shader.enable();
+  glBindTextureUnit(unit, _id);
   shader.setInt(uniform, unit);
 }

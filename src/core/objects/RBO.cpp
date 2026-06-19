@@ -1,3 +1,4 @@
+#include "glad/glad.h"
 #include <core/Object.hpp>
 
 /* ========================================================================== */
@@ -5,10 +6,8 @@
 /* ========================================================================== */
 
 RBO::RBO(int width, int height) {
-  glGenRenderbuffers(1, &_id);
-  this->bind();
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-  this->unbind();
+  glCreateRenderbuffers(1, &_id);
+  glNamedRenderbufferStorage(_id, GL_DEPTH24_STENCIL8, width, height);
 }
 
 RBO::~RBO() { glDeleteRenderbuffers(1, &_id); }

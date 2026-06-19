@@ -22,7 +22,7 @@ void Interface::init(Window& window) {
   io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;
   ImGui::StyleColorsDark();
   this->window->initImGui();
-  ImGui_ImplOpenGL3_Init("#version 330");
+  ImGui_ImplOpenGL3_Init("#version 460");
 }
 
 /* ========================================================================== */

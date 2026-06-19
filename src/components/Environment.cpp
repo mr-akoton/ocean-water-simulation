@@ -1,3 +1,5 @@
+#include "glad/glad.h"
+#include "glm/ext/vector_float4.hpp"
 #include <components/Environment.hpp>
 #include <components/CubeMap.hpp>
 #include <settings/SettingsData.hpp>
@@ -23,46 +25,40 @@ Environment::Environment(void)
     : shader(VERTEX_SHADER, FRAGMENT_SHADER),
       skybox((const char**)SKYBOX_FACES), skyColor(0.0f),
       lightDirection(-0.2f, -0.2f, -1.0f), lightColor(1.0f) {
-  shader.enable();
-  shader.setInt("u_colorTexture", 0);
-  shader.setInt("u_depthTexture", 1);
-
-  _vao.bind();
   _vbo.bindData(_vertices);
-  _vao.linkAttribute(_vbo, 0, 2, GL_FLOAT, sizeof(glm::vec4), (void*)0);
-  _vao.linkAttribute(_vbo, 1, 2, GL_FLOAT, sizeof(glm::vec4),
-                     (void*)(2 * sizeof(float)));
-  _vao.unbind();
-  _vbo.unbind();
+  _vao.linkVBO(_vbo, 0, 0, sizeof(glm::vec4));
+  _vao.linkAttribute(0, 2, GL_FLOAT, 0);
+  _vao.linkAttribute(1, 2, GL_FLOAT, 2 * sizeof(float));
 
-  _fbo.bind();
-  glActiveTexture(GL_TEXTURE0);
-  glGenTextures(1, &_colorTexture);
-  glBindTexture(GL_TEXTURE_2D, _colorTexture);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WINDOW_WIDTH, WINDOW_HEIGHT, 0, GL_RGB,
-               GL_UNSIGNED_BYTE, NULL);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                         _colorTexture, 0);
+  // Init Color texture
+  glCreateTextures(GL_TEXTURE_2D, 1, &_colorTexture);
+  glTextureStorage2D(_colorTexture, 1, GL_RGB8, WINDOW_WIDTH, WINDOW_HEIGHT);
+  glTextureParameteri(_colorTexture, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTextureParameteri(_colorTexture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTextureParameteri(_colorTexture, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTextureParameteri(_colorTexture, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  _fbo.attachTexture(_colorTexture, GL_COLOR_ATTACHMENT0, 0);
 
-  glActiveTexture(GL_TEXTURE1);
-  glGenTextures(1, &_depthTexture);
-  glBindTexture(GL_TEXTURE_2D, _depthTexture);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, WINDOW_WIDTH,
-               WINDOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
-                         _depthTexture, 0);
+  // Init Depth texture
+  glCreateTextures(GL_TEXTURE_2D, 1, &_depthTexture);
+  glTextureStorage2D(_depthTexture, 1, GL_DEPTH_COMPONENT24, WINDOW_WIDTH,
+                     WINDOW_HEIGHT);
+  glTextureParameteri(_depthTexture, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTextureParameteri(_depthTexture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTextureParameteri(_depthTexture, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+  glTextureParameteri(_depthTexture, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+  float borderColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
+  glTextureParameterfv(_depthTexture, GL_TEXTURE_BORDER_COLOR, borderColor);
+  _fbo.attachTexture(_depthTexture, GL_DEPTH_ATTACHMENT, 0);
 
-  auto fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+  auto fboStatus = glCheckNamedFramebufferStatus(_fbo.getID(), GL_FRAMEBUFFER);
   if (fboStatus != GL_FRAMEBUFFER_COMPLETE) {
     std::cerr << "Framebuffer error: " << fboStatus << std::endl;
   }
-  _fbo.unbind();
+
+  shader.enable();
+  shader.setInt("u_colorTexture", 0);
+  shader.setInt("u_depthTexture", 1);
 }
 
 Environment::~Environment() {}
@@ -97,10 +93,8 @@ void Environment::render(Camera& camera) {
   shader.setFloat("u_fogOffset", fog.offset);
   shader.setVec3("u_fogColor", fog.color);
 
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, _colorTexture);
-  glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D, _depthTexture);
+  glBindTextureUnit(0, _colorTexture);
+  glBindTextureUnit(1, _depthTexture);
 
   glDrawArrays(GL_TRIANGLES, 0, 6);
   glEnable(GL_DEPTH_TEST);

@@ -18,6 +18,7 @@ struct Vertex {
 /* ========================================================================== */
 
 class VBO;
+class EBO;
 
 class VAO {
 private:
@@ -29,8 +30,10 @@ public:
 
   void bind(void) const;
   void unbind(void) const;
-  void linkAttribute(const VBO& vbo, GLuint index, GLint size, GLenum type,
-                     GLsizei stride, const void* pointer) const;
+  void linkAttribute(GLuint index, GLint size, GLenum type,
+                     GLuint offest) const;
+  void linkVBO(VBO& vbo, GLuint index, GLuint offset, GLsizei stride);
+  void linkEBO(EBO& ebo);
 };
 
 /* ========================================================================== */
@@ -55,6 +58,7 @@ public:
   void bindData(const std::vector<glm::vec2>& vertices);
   void bindData(const std::vector<glm::vec3>& vertices);
   void bindData(const std::vector<glm::vec4>& vertices);
+  GLuint getID(void) const;
 };
 
 /* ========================================================================== */
@@ -73,6 +77,7 @@ public:
   void bindData(const std::vector<GLuint>& indices);
   void bind(void) const;
   void unbind(void) const;
+  GLuint getID(void) const;
 };
 
 /* ========================================================================== */
@@ -89,6 +94,8 @@ public:
 
   void bind(void) const;
   void unbind(void) const;
+  void attachTexture(GLuint texture, GLenum attachPoint, GLint mipmapLevel);
+  GLuint getID(void) const;
 };
 
 /* ========================================================================== */

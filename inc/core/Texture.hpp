@@ -23,7 +23,8 @@ private:
   GLuint _unit;
 
 public:
-  Texture(const char* file, GLuint slot, GLenum format, GLenum pixType);
+  Texture(const char* file, GLuint slot, GLenum format, GLenum inFormat,
+          GLenum dataType);
   ~Texture();
 
   void setFilter(GLuint filter) const;

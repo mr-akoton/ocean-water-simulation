@@ -1,10 +1,7 @@
-#include "components/Environment.hpp"
-#include "imgui/imgui.h"
-#include "settings/SettingsManager.hpp"
 #include <core/Engine.hpp>
+#include <settings/SettingsData.hpp>
 #include <iostream>
 #include <ostream>
-#include <settings/SettingsData.hpp>
 
 using namespace glm;
 
@@ -41,9 +38,10 @@ Engine::~Engine() {
 
 void Engine::_initGLFW(void) const {
   glfwInit();
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
   glfwWindowHint(GLFW_RESIZABLE, false);
 }
 
