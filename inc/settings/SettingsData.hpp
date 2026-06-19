@@ -42,6 +42,10 @@ struct data {
   float ambientStrength{0.4f};
   float specularStrength{1.0f};
   int shininess{256};
+  float minDivision{2.0};
+  float maxDivision{32.0};
+  float minDistance{1.0};
+  float maxDistance{1000.0f};
 
   // Environment
   glm::vec3 skyColor{0.0f, 0.0f, 0.0f};
@@ -64,5 +68,11 @@ struct data {
 void to_json(nlohmann::json& j, const data& s);
 void from_json(const nlohmann::json& j, data& s);
 }; // namespace setting
+
+template <typename T>
+static void get_optional(const nlohmann::json& j, const char* key, T& value) {
+  if (auto it = j.find(key); it != j.end() && !it->is_null())
+    it->get_to(value);
+}
 
 #endif

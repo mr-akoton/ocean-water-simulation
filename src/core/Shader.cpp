@@ -1,3 +1,4 @@
+#include "glad/glad.h"
 #include <core/Shader.hpp>
 
 #include <fstream>
@@ -25,15 +26,25 @@ static std::string getFileContent(const std::string path) {
   throw std::runtime_error("Error: failed to open " + path);
 }
 
-Shader::Shader(const std::string vertex, const std::string fragment)
-    : _vertexShaderFile(vertex), _fragmentShaderFile(fragment) {
+Shader::Shader(const std::string vertex, const std::string fragment,
+               const std::string tesControl, const std::string tesEval)
+    : _vertexShaderFile(vertex), _tesControlShaderFile(tesControl),
+      _tesEvalShaderFile(tesEval), _fragmentShaderFile(fragment) {
+  bool hasTesselation = (not tesControl.empty() and not tesEval.empty());
+
   const std::string vertexContent = getFileContent(vertex);
   const std::string fragmentContent = getFileContent(fragment);
+  const std::string tesControlContent =
+      hasTesselation ? getFileContent(tesControl) : "";
+  const std::string tesEvalContent =
+      hasTesselation ? getFileContent(tesEval) : "";
 
   const char* vertexSource = vertexContent.c_str();
+  const char* tesControlSource = tesControlContent.c_str();
+  const char* tesEvalSource = tesEvalContent.c_str();
   const char* fragmentSource = fragmentContent.c_str();
 
-  GLuint vertexShader, fragmentShader;
+  GLuint vertexShader, fragmentShader, tesControlShader, tesEvalShader;
 
   vertexShader = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vertexShader, 1, &vertexSource, nullptr);
@@ -45,14 +56,34 @@ Shader::Shader(const std::string vertex, const std::string fragment)
   glCompileShader(fragmentShader);
   _debugShaderCompilation(fragmentShader, fragment);
 
+  if (hasTesselation) {
+    tesControlShader = glCreateShader(GL_TESS_CONTROL_SHADER);
+    glShaderSource(tesControlShader, 1, &tesControlSource, nullptr);
+    glCompileShader(tesControlShader);
+    _debugShaderCompilation(tesControlShader, tesControl);
+
+    tesEvalShader = glCreateShader(GL_TESS_EVALUATION_SHADER);
+    glShaderSource(tesEvalShader, 1, &tesEvalSource, nullptr);
+    glCompileShader(tesEvalShader);
+    _debugShaderCompilation(tesEvalShader, tesEval);
+  }
+
   _id = glCreateProgram();
   glAttachShader(_id, vertexShader);
   glAttachShader(_id, fragmentShader);
+  if (hasTesselation) {
+    glAttachShader(_id, tesControlShader);
+    glAttachShader(_id, tesEvalShader);
+  }
   glLinkProgram(_id);
   _debugProgramLink(_id);
 
   glDeleteShader(vertexShader);
   glDeleteShader(fragmentShader);
+  if (hasTesselation) {
+    glDeleteShader(tesControlShader);
+    glDeleteShader(tesEvalShader);
+  }
 }
 
 Shader::~Shader() { glDeleteProgram(_id); }

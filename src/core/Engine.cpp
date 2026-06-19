@@ -1,3 +1,6 @@
+#include "glad/glad.h"
+#include "glm/ext/vector_float3.hpp"
+#include "imgui/imgui.h"
 #include <core/Engine.hpp>
 #include <settings/SettingsData.hpp>
 #include <iostream>
@@ -22,8 +25,9 @@ Engine::Engine(void)
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
-
   glDepthFunc(GL_LESS);
+
+  glPatchParameteri(GL_PATCH_VERTICES, 4);
 }
 
 Engine::~Engine() {
@@ -58,8 +62,13 @@ void Engine::_initGLAD(void) const {
 /* ========================================================================== */
 
 void Engine::run(void) {
-  Water water(1000, 1000);
+  int waterSize = 128;
+  int waterGridSize = 50;
+  int waterCenter = waterSize * waterGridSize * 0.5;
+
+  Water water(waterSize, waterSize, waterGridSize);
   water.init();
+  camera.position = vec3(waterCenter, 100.0, waterCenter);
 
   Environment environment;
   CubeMap& skybox = environment.skybox;
@@ -144,58 +153,84 @@ void Engine::_displayUI(Water& water, Environment& environment, char* fpsText) {
 
   ImGui::Separator();
 
-  if (ImGui::CollapsingHeader("Water", ImGuiTreeNodeFlags_DefaultOpen)) {
-    ImGui::ColorEdit3("Water Color", value_ptr(water.color));
+  if (ImGui::BeginTabBar("SettingsTabs", ImGuiTabBarFlags_None)) {
+    if (ImGui::BeginTabItem("Water")) {
+      ImGui::ColorEdit3("Water Color", value_ptr(water.color));
+      ImGui::DragInt("Iterations", &water.iteration, 1, 1, MAX_WAVE_ITERATION);
 
-    ImGui::DragInt("Iterations", &water.iteration, 1, 1, MAX_WAVE_ITERATION);
+      if (ImGui::CollapsingHeader("Wave Parameters",
+                                  ImGuiTreeNodeFlags_DefaultOpen)) {
+        ImGui::SliderFloat("Amplitude", &water.amplitude, 0.0f, 20.0f, "%.2f");
+        ImGui::SliderFloat("Frequency", &water.frequency, 0.0f, 1.0f, "%.3f");
+        ImGui::SliderFloat("Speed", &water.speed, 0.0f, 10.0f, "%.2f");
+        ImGui::SliderFloat("Drag", &water.drag, 0.0f, 5.0f, "%.2f");
+      }
 
-    ImGui::SliderFloat("Amplitude", &water.amplitude, 0.0f, 20.0f, "%.2f");
-    ImGui::SliderFloat("Frequency", &water.frequency, 0.0f, 1.0f, "%.3f");
-    ImGui::SliderFloat("Speed", &water.speed, 0.0f, 10.0f, "%.2f");
-    ImGui::SliderFloat("Drag", &water.drag, 0.0f, 5.0f, "%.2f");
+      if (ImGui::CollapsingHeader("Wave Shaping",
+                                  ImGuiTreeNodeFlags_DefaultOpen)) {
+        ImGui::InputFloat("Peak Max", &water.peakMax);
+        ImGui::InputFloat("Peak Offset", &water.peakOffset);
+      }
 
-    ImGui::SeparatorText("Wave Shaping");
-    ImGui::InputFloat("Peak Max", &water.peakMax);
-    ImGui::InputFloat("Peak Offset", &water.peakOffset);
+      if (ImGui::CollapsingHeader("Multipliers")) {
+        ImGui::DragFloat("Amplitude Mult", &water.amplitudeMult, 0.01f, 0.0f,
+                         10.0f);
+        ImGui::DragFloat("Frequency Mult", &water.frequencyMult, 0.01f, 0.0f,
+                         10.0f);
+        ImGui::DragFloat("Speed Mult", &water.speedMult, 0.01f, 0.0f, 10.0f);
+      }
 
-    ImGui::SeparatorText("Multipliers");
-    ImGui::DragFloat("Amplitude Mult", &water.amplitudeMult, 0.01f, 0.0f,
-                     10.0f);
-    ImGui::DragFloat("Frequency Mult", &water.frequencyMult, 0.01f, 0.0f,
-                     10.0f);
-    ImGui::DragFloat("Speed Mult", &water.speedMult, 0.01f, 0.0f, 10.0f);
+      if (ImGui::CollapsingHeader("Materials")) {
+        ImGui::ColorEdit3("Ambient Color", value_ptr(water.ambientColor));
+        ImGui::SliderFloat("Ambient Strength", &water.ambientStrength, 0.0f,
+                           1.0f, "%.2f");
+        ImGui::SliderFloat("Specular Strength", &water.specularStrength, 0.0f,
+                           1.0f, "%.2f");
+        ImGui::InputInt("Shininess", &water.shininess);
+      }
 
-    ImGui::SeparatorText("Materials");
-    ImGui::ColorEdit3("Ambient Color", value_ptr(water.ambientColor));
-    ImGui::SliderFloat("Ambient Strength", &water.ambientStrength, 0.0f, 1.0f,
-                       "%.2f");
-    ImGui::SliderFloat("Specular Strength", &water.specularStrength, 0.0f, 1.0f,
-                       "%.2f");
-    ImGui::InputInt("Shininess", &water.shininess);
-  }
+      if (ImGui::CollapsingHeader("Tessellation")) {
+        ImGui::InputFloat("Min Division", &water.minDivision);
+        ImGui::InputFloat("Max Division", &water.maxDivision);
+        ImGui::InputFloat("Min Distance", &water.minDistance);
+        ImGui::InputFloat("Max Distance", &water.maxDistance);
+      }
 
-  if (ImGui::CollapsingHeader("Lighting")) {
-    ImGui::ColorEdit3("Sky Color", value_ptr(environment.skyColor));
-    ImGui::ColorEdit3("Light Color", value_ptr(environment.lightColor));
-    ImGui::SliderFloat3("Direction", value_ptr(environment.lightDirection),
-                        -1.0f, 1.0f);
+      ImGui::EndTabItem();
+    }
 
-    ImGui::Separator();
-    ImGui::DragFloat("Sun Size", &environment.skybox.sunSize, 0.01f, 0.0f,
-                     100.0f);
-    ImGui::DragFloat("Sun Brightness", &environment.skybox.sunBrightness, 0.01f,
-                     0.0f, 10.0f);
-  }
+    if (ImGui::BeginTabItem("Lighting")) {
+      ImGui::ColorEdit3("Sky Color", value_ptr(environment.skyColor));
+      ImGui::ColorEdit3("Light Color", value_ptr(environment.lightColor));
+      ImGui::SliderFloat3("Direction", value_ptr(environment.lightDirection),
+                          -1.0f, 1.0f);
 
-  if (ImGui::CollapsingHeader("Fog")) {
-    ImGui::Checkbox("Enable Fog", &environment.fog.enabled);
-    ImGui::ColorEdit3("Fog Color", value_ptr(environment.fog.color));
+      ImGui::Separator();
 
-    ImGui::DragFloat("Fog Near", &environment.fog.near, 0.1f, 0.0f, 1000.0f);
-    ImGui::DragFloat("Fog Far", &environment.fog.far, 0.1f, 0.0f, 5000.0f);
+      ImGui::DragFloat("Sun Size", &environment.skybox.sunSize, 0.01f, 0.0f,
+                       100.0f);
+      ImGui::DragFloat("Sun Brightness", &environment.skybox.sunBrightness,
+                       0.01f, 0.0f, 10.0f);
 
-    ImGui::InputFloat("Fog Steepness", &environment.fog.steepness);
-    ImGui::InputFloat("Fog Offset", &environment.fog.offset);
+      ImGui::EndTabItem();
+    }
+
+    if (ImGui::BeginTabItem("Fog")) {
+      ImGui::Checkbox("Enable Fog", &environment.fog.enabled);
+      ImGui::ColorEdit3("Fog Color", value_ptr(environment.fog.color));
+
+      ImGui::Separator();
+
+      ImGui::DragFloat("Fog Near", &environment.fog.near, 0.1f, 0.0f, 1000.0f);
+      ImGui::DragFloat("Fog Far", &environment.fog.far, 0.1f, 0.0f, 5000.0f);
+
+      ImGui::InputFloat("Fog Steepness", &environment.fog.steepness);
+      ImGui::InputFloat("Fog Offset", &environment.fog.offset);
+
+      ImGui::EndTabItem();
+    }
+
+    ImGui::EndTabBar();
   }
 
   ImGui::End();
@@ -231,6 +266,10 @@ void Engine::_loadSettings(Water& water, Environment& environment) {
   water.ambientStrength = settings.ambientStrength;
   water.specularStrength = settings.specularStrength;
   water.shininess = settings.shininess;
+  water.minDivision = settings.minDivision;
+  water.maxDivision = settings.maxDivision;
+  water.minDistance = settings.minDistance;
+  water.maxDistance = settings.maxDistance;
 
   environment.fog.enabled = settings.enableFog;
   environment.fog.color = settings.fogColor;
@@ -264,6 +303,10 @@ void Engine::_saveSettings(const Water& water, const Environment& environment) {
   settings.ambientStrength = water.ambientStrength;
   settings.specularStrength = water.specularStrength;
   settings.shininess = water.shininess;
+  settings.minDivision = water.minDivision;
+  settings.maxDivision = water.maxDivision;
+  settings.minDistance = water.minDistance;
+  settings.maxDistance = water.maxDistance;
 
   settings.enableFog = environment.fog.enabled;
   settings.fogColor = environment.fog.color;

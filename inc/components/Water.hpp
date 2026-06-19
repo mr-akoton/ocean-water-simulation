@@ -45,6 +45,11 @@ public:
   float specularStrength;
   int shininess;
 
+  float minDivision;
+  float maxDivision;
+  float minDistance;
+  float maxDistance;
+
   glm::vec3 position;
   glm::vec3 color;
   glm::mat4 model;

@@ -32,6 +32,10 @@
         -0.3050000071525574,
         -1.0
     ],
+    "maxDistance": 1000.0,
+    "maxDivision": 20.0,
+    "minDistance": 1.0,
+    "minDivision": 2.0,
     "peakMax": 1.0,
     "peakOffset": 1.0,
     "shininess": 256,
