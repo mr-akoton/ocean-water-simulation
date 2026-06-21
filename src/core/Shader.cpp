@@ -44,7 +44,7 @@ Shader::Shader(const std::string vertex, const std::string fragment,
   const char* tesEvalSource = tesEvalContent.c_str();
   const char* fragmentSource = fragmentContent.c_str();
 
-  GLuint vertexShader, fragmentShader, tesControlShader, tesEvalShader;
+  GLuint vertexShader, fragmentShader, tesControlShader = 0, tesEvalShader = 0;
 
   vertexShader = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vertexShader, 1, &vertexSource, nullptr);
