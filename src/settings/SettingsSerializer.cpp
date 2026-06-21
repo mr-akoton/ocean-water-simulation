@@ -21,6 +21,10 @@ void applyWater(const data& s, Water& water) {
   water.baseReflectance = s.baseReflectance;
   water.roughness = s.roughness;
   water.metallic = s.metallic;
+  water.scatterColor = s.scatterColor;
+  water.scatterStrength = s.scatterStrength;
+  water.scatterPower = s.scatterPower;
+  water.scatterDistortion = s.scatterDistortion;
   water.minDivision = s.minDivision;
   water.maxDivision = s.maxDivision;
   water.minDistance = s.minDistance;
@@ -44,6 +48,10 @@ void extractWater(data& s, const Water& water) {
   s.baseReflectance = water.baseReflectance;
   s.roughness = water.roughness;
   s.metallic = water.metallic;
+  s.scatterColor = water.scatterColor;
+  s.scatterStrength = water.scatterStrength;
+  s.scatterPower = water.scatterPower;
+  s.scatterDistortion = water.scatterDistortion;
   s.minDivision = water.minDivision;
   s.maxDivision = water.maxDivision;
   s.minDistance = water.minDistance;

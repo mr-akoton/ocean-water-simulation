@@ -1,6 +1,7 @@
 #ifndef WATER_HPP
 #define WATER_HPP
 
+#include "glm/ext/vector_float3.hpp"
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <components/Camera.hpp>
@@ -35,6 +36,11 @@ public:
   glm::vec3 baseReflectance;
   float roughness;
   float metallic;
+
+  glm::vec3 scatterColor;
+  float scatterStrength;
+  float scatterPower;
+  float scatterDistortion;
 
   float minDivision;
   float maxDivision;

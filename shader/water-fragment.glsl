@@ -6,16 +6,17 @@ uniform samplerCube u_skybox;
 uniform vec3 u_lightDirection;
 uniform vec3 u_lightColor;
 uniform vec3 u_viewPosition;
-
-// uniform float u_ambientStrength;
-// uniform vec3 u_ambientColor;
-// uniform float u_specularStrength;
-// uniform int u_shininess;
+uniform float u_heightMax;
 
 uniform vec3 u_emissivity;
 uniform vec3 u_baseReflectance;
 uniform float u_roughness;
 uniform float u_metallic;
+
+uniform vec3 u_scatterColor;
+uniform float u_scatterStrength;
+uniform float u_scatterPower;
+uniform float u_scatterDistortion;
 
 in vec3 p_fragPosition;
 in vec3 p_color;
@@ -23,40 +24,13 @@ in vec3 p_normal;
 
 out vec4 FragColor;
 
-// vec3 getLight() {
-//     vec3 normal = normalize(p_normal);
-
-//     vec3 lightDirection = normalize(-u_lightDirection);
-//     vec3 viewDirection = normalize(u_viewPosition - p_fragPosition);
-
-//     // Fresnel (Schlick approximation)
-//     float fresnel = pow(1.0 - max(dot(normal, viewDirection), 0.0), 5.0);
-
-//     // Reflection for environment mapping
-//     vec3 refl = reflect(-viewDirection, normal);
-
-//     // Diffuse light
-//     float diff = max(dot(normal, lightDirection), 0.0);
-
-//     // Specular reflection
-//     vec3 halfwayDir = normalize(lightDirection + viewDirection);
-//     float spec = pow(max(dot(normal, halfwayDir), 0.0), u_shininess) * u_specularStrength * fresnel;
-
-//     vec3 ambient = u_ambientStrength * u_ambientColor * p_color;
-//     vec3 diffuse = diff * p_color * u_lightColor;
-//     vec3 specular = spec * u_lightColor;
-//     vec3 reflection = texture(u_skybox, refl).rgb * fresnel;
-
-//     return ambient + diffuse + specular + reflection;
-// }
-
 vec3 getLight(vec3 color) {
     // Basic vector for calculation
     vec3 N = normalize(p_normal); // Normal vector
     vec3 L = normalize(-u_lightDirection); // Light vector
     vec3 V = normalize(u_viewPosition - p_fragPosition); // View vector
     vec3 H = normalize(L + V); // Half-way vector
-    vec3 R = reflect(-V, N);
+    vec3 R = reflect(-V, N); // Reflection of the view vector
 
     // Precomputed value
     float VH = max(dot(V, H), 0.0);
@@ -100,11 +74,21 @@ vec3 getLight(vec3 color) {
     vec3 BRDF = k_d * diffuse + specular;
     vec3 light = u_emissivity + BRDF * u_lightColor * NL;
 
+    // Env Reflection
     float mip = u_roughness * 8.0;
     vec3 env = textureLod(u_skybox, R, mip).rgb;
     vec3 reflection = env * k_s;
 
-    return light + reflection;
+    // Scattered Light
+    float waveHeight = clamp(p_fragPosition.y / u_heightMax, 0.0, 1.0);
+    vec3 LT = normalize(L + N * u_scatterDistortion);
+
+    float viewScatter = pow(max(dot(V, -LT), 0.0), u_scatterPower);
+    float backlit = pow(max(0.0, 0.5 - 0.5 * dot(L, N)), 3.0);
+
+    vec3 scatter = waveHeight * viewScatter * backlit * u_scatterStrength * u_scatterColor * u_lightColor;
+
+    return light + reflection + scatter;
 }
 
 void main() {

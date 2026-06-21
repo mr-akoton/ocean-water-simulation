@@ -28,6 +28,10 @@ struct data {
   glm::vec3 baseReflectance{0.0f};
   float roughness{0.0f};
   float metallic{0.0f};
+  glm::vec3 scatterColor{0.0f, 0.8f, 0.2f};
+  float scatterStrength{0.5f};
+  float scatterPower{2.0f};
+  float scatterDistortion{0.4f};
   float minDivision{2.0};
   float maxDivision{32.0};
   float minDistance{1.0};

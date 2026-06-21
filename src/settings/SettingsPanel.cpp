@@ -46,11 +46,20 @@ bool SettingsPanel::render(Water& water, Environment& environment,
       }
 
       if (ImGui::CollapsingHeader("Materials")) {
+        ImGui::SeparatorText("PBR");
         ImGui::ColorEdit3("Emissivity", glm::value_ptr(water.emissivity));
         ImGui::ColorEdit3("Base Reflectance",
                           glm::value_ptr(water.baseReflectance));
-        ImGui::SliderFloat("Roughness", &water.roughness, 0.0f, 1.0f, "%.5f");
-        ImGui::SliderFloat("Metallic", &water.metallic, 0.0f, 1.0f, "%.5f");
+        ImGui::SliderFloat("Roughness", &water.roughness, 0.0f, 1.0f, "%.2f");
+        ImGui::SliderFloat("Metallic", &water.metallic, 0.0f, 1.0f, "%.2f");
+        ImGui::SeparatorText("Scatter");
+        ImGui::ColorEdit3("Scatter Color", glm::value_ptr(water.scatterColor));
+        ImGui::SliderFloat("Scatter Strength", &water.scatterStrength, 0.0f,
+                           10.0f, "%.2f");
+        ImGui::SliderFloat("Scatter Power", &water.scatterPower, 1.0f, 32.0f,
+                           "%.0f");
+        ImGui::SliderFloat("Scatter Distortion", &water.scatterDistortion, 0.0f,
+                           1.0f, "%.2f");
       }
 
       if (ImGui::CollapsingHeader("Tessellation")) {
