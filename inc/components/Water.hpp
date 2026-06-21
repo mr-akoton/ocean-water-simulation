@@ -1,23 +1,14 @@
 #ifndef WATER_HPP
 #define WATER_HPP
 
-#include "glm/ext/matrix_float4x4.hpp"
-#include "glm/ext/vector_float3.hpp"
-#ifndef GLM_ENABLE_EXPERIMENTAL
-#define GLM_ENABLE_EXPERIMENTAL
-#endif
-
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 #include <glm/glm.hpp>
-#include <glm/gtx/transform.hpp>
-
 #include <components/Camera.hpp>
 #include <components/Environment.hpp>
-#include <core/Object.hpp>
+#include <core/buffers/VAO.hpp>
+#include <core/buffers/VBO.hpp>
+#include <core/buffers/EBO.hpp>
 #include <core/Shader.hpp>
-
 #include <vector>
 
 class Water {

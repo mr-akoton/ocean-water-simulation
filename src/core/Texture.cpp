@@ -1,6 +1,6 @@
-#include "glad/glad.h"
+#include <glm/gtc/type_ptr.hpp>
+#include <stb/stb_image.h>
 #include <core/Texture.hpp>
-#include <core/Engine.hpp>
 
 using namespace glm;
 

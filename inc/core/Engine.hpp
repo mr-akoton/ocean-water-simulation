@@ -1,23 +1,12 @@
 #ifndef ENGINE_HPP
 #define ENGINE_HPP
 
-#include "components/Environment.hpp"
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
-
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 #include <components/Camera.hpp>
+#include <components/Environment.hpp>
 #include <components/Interface.hpp>
 #include <components/Water.hpp>
-#include <core/Object.hpp>
-#include <core/Shader.hpp>
 #include <core/Window.hpp>
-#include <effects/Fog.hpp>
-#include <settings/SettingsManager.hpp>
-
+#include <settings/SettingsPanel.hpp>
 #include <exception>
 
 class Engine {
@@ -31,6 +20,7 @@ private:
   float _lastFrame;
   float _deltaTime;
   unsigned int _frameCount;
+  SettingsPanel _settingsPanel;
 
 public:
   Engine(void);
@@ -43,7 +33,6 @@ private:
   void _initGLAD(void) const;
   void _handleInput(void);
   void _updateDeltaTime(void);
-  void _displayUI(Water& water, Environment& environment, char* fpsText);
   void _loadSettings(Water& water, Environment& environment);
   void _saveSettings(const Water& water, const Environment& environment);
 

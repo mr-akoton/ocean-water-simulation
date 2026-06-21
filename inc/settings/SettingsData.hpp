@@ -4,20 +4,6 @@
 #include <nlohmann/json.hpp>
 #include <glm/glm.hpp>
 
-constexpr int WINDOW_WIDTH = 1280;
-constexpr int WINDOW_HEIGHT = 720;
-constexpr const char* WINDOW_TITLE = "OpenGL - Water";
-constexpr const char* SKYBOX_FACES[6] = {
-    "resources/right.png",  "resources/left.png",  "resources/top.png",
-    "resources/bottom.png", "resources/front.png", "resources/back.png"};
-
-// Cap it to this value because my PC is potato :v
-constexpr const int MAX_WAVE_ITERATION = 64;
-
-constexpr float CAMERA_FOV = 60.0f;
-constexpr float CAMERA_NEAR = 0.1f;
-constexpr float CAMERA_FAR = 2000.0f;
-
 namespace glm {
 void to_json(nlohmann::json& j, const glm::vec3& v);
 void from_json(const nlohmann::json& j, glm::vec3& v);

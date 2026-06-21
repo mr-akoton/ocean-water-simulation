@@ -1,5 +1,5 @@
-#include "glad/glad.h"
-#include <core/Object.hpp>
+#include <glad/glad.h>
+#include <core/buffers/FBO.hpp>
 
 /* ========================================================================== */
 /*                          CONTRUCTOR AND DESTRUCTOR                         */

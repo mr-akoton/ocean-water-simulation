@@ -1,8 +1,12 @@
-#include "core/Object.hpp"
-#include "glad/glad.h"
-#include "glm/ext/vector_float2.hpp"
+#include <glad/glad.h>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
+#include <core/Config.hpp>
+#include <core/buffers/EBO.hpp>
+#include <core/buffers/VBO.hpp>
 #include <components/Water.hpp>
-#include <settings/SettingsData.hpp>
 
 static const char* VERTEX_SHADER = "shader/water-vertex.glsl";
 static const char* FRAGMENT_SHADER = "shader/water-fragment.glsl";

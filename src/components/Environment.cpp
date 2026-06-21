@@ -1,8 +1,8 @@
-#include "glad/glad.h"
-#include "glm/ext/vector_float4.hpp"
+#include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <core/Config.hpp>
 #include <components/Environment.hpp>
-#include <components/CubeMap.hpp>
-#include <settings/SettingsData.hpp>
 #include <iostream>
 
 static const char* VERTEX_SHADER = "shader/postpro-vertex.glsl";
@@ -21,8 +21,9 @@ const std::vector<glm::vec4> Environment::_vertices{
 /*                         CONSTRUCTOR AND DESTRUCTOR                         */
 /* ========================================================================== */
 
-Environment::Environment(void)
-    : shader(VERTEX_SHADER, FRAGMENT_SHADER),
+Environment::Environment(int width, int height)
+    : _width(width), _height(height),
+      shader(VERTEX_SHADER, FRAGMENT_SHADER),
       skybox((const char**)SKYBOX_FACES), skyColor(0.0f),
       lightDirection(-0.2f, -0.2f, -1.0f), lightColor(1.0f) {
   _vbo.bindData(_vertices);
@@ -32,7 +33,7 @@ Environment::Environment(void)
 
   // Init Color texture
   glCreateTextures(GL_TEXTURE_2D, 1, &_colorTexture);
-  glTextureStorage2D(_colorTexture, 1, GL_RGB8, WINDOW_WIDTH, WINDOW_HEIGHT);
+  glTextureStorage2D(_colorTexture, 1, GL_RGB8, _width, _height);
   glTextureParameteri(_colorTexture, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTextureParameteri(_colorTexture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTextureParameteri(_colorTexture, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -41,8 +42,7 @@ Environment::Environment(void)
 
   // Init Depth texture
   glCreateTextures(GL_TEXTURE_2D, 1, &_depthTexture);
-  glTextureStorage2D(_depthTexture, 1, GL_DEPTH_COMPONENT24, WINDOW_WIDTH,
-                     WINDOW_HEIGHT);
+  glTextureStorage2D(_depthTexture, 1, GL_DEPTH_COMPONENT24, _width, _height);
   glTextureParameteri(_depthTexture, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTextureParameteri(_depthTexture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTextureParameteri(_depthTexture, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);

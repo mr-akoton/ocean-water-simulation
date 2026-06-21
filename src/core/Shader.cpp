@@ -1,6 +1,6 @@
-#include "glad/glad.h"
+#include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
 #include <core/Shader.hpp>
-
 #include <fstream>
 #include <iostream>
 

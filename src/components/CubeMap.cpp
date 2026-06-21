@@ -1,8 +1,9 @@
-#include "glad/glad.h"
-#include "glm/ext/vector_float3.hpp"
+#include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <stb/stb_image.h>
 #include <components/CubeMap.hpp>
 #include <components/Environment.hpp>
-#include <settings/SettingsData.hpp>
 #include <iostream>
 
 static const char* VERTEX_SHADER = "shader/skybox-vertex.glsl";
@@ -93,7 +94,7 @@ void CubeMap::render(Camera& camera, Environment& environment) {
   view = glm::mat4(glm::mat3(glm::lookAt(
       camera.position, camera.position + camera.orientation, camera.up)));
   projection = glm::perspective(
-      glm::radians(45.0f), (float)WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.0f);
+      glm::radians(45.0f), (float)camera.width / camera.height, 0.1f, 100.0f);
 
   shader.setMat4("u_view", view);
   shader.setMat4("u_projection", projection);

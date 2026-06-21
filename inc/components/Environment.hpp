@@ -2,22 +2,21 @@
 #define ENVIRONMENT_HPP
 
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 #include <glm/glm.hpp>
 #include <components/Camera.hpp>
 #include <components/CubeMap.hpp>
-#include <core/Object.hpp>
-#include <core/Texture.hpp>
+#include <core/buffers/VAO.hpp>
+#include <core/buffers/VBO.hpp>
+#include <core/buffers/FBO.hpp>
 #include <effects/Fog.hpp>
-
 #include <vector>
-
-class CubeMap;
 
 class Environment {
 private:
   static const std::vector<glm::vec4> _vertices;
+
+  int _width;
+  int _height;
 
   VAO _vao;
   VBO _vbo;
@@ -35,7 +34,7 @@ public:
   glm::vec3 lightColor;
 
 public:
-  Environment(void);
+  Environment(int width, int height);
   ~Environment();
 
   void render(Camera& camera);

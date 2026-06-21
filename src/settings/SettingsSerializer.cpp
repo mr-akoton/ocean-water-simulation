@@ -1,0 +1,91 @@
+#include <settings/SettingsSerializer.hpp>
+#include <components/Water.hpp>
+#include <components/Environment.hpp>
+
+namespace setting {
+
+void applyWater(const data& s, Water& water) {
+  water.iteration = s.iteration;
+  water.amplitude = s.amplitude;
+  water.frequency = s.frequency;
+  water.speed = s.speed;
+  water.drag = s.drag;
+  water.peakMax = s.peakMax;
+  water.peakOffset = s.peakOffset;
+  water.amplitudeMult = s.amplitudeMult;
+  water.frequencyMult = s.frequencyMult;
+  water.speedMult = s.speedMult;
+  water.iterationMult = s.iterationMult;
+  water.ambientColor = s.ambientColor;
+  water.color = s.waterColor;
+  water.ambientStrength = s.ambientStrength;
+  water.specularStrength = s.specularStrength;
+  water.shininess = s.shininess;
+  water.minDivision = s.minDivision;
+  water.maxDivision = s.maxDivision;
+  water.minDistance = s.minDistance;
+  water.maxDistance = s.maxDistance;
+}
+
+void extractWater(data& s, const Water& water) {
+  s.iteration = water.iteration;
+  s.amplitude = water.amplitude;
+  s.frequency = water.frequency;
+  s.speed = water.speed;
+  s.drag = water.drag;
+  s.peakMax = water.peakMax;
+  s.peakOffset = water.peakOffset;
+  s.amplitudeMult = water.amplitudeMult;
+  s.frequencyMult = water.frequencyMult;
+  s.speedMult = water.speedMult;
+  s.iterationMult = water.iterationMult;
+  s.ambientColor = water.ambientColor;
+  s.waterColor = water.color;
+  s.ambientStrength = water.ambientStrength;
+  s.specularStrength = water.specularStrength;
+  s.shininess = water.shininess;
+  s.minDivision = water.minDivision;
+  s.maxDivision = water.maxDivision;
+  s.minDistance = water.minDistance;
+  s.maxDistance = water.maxDistance;
+}
+
+void applyEnvironment(const data& s, Environment& env) {
+  env.fog.enabled = s.enableFog;
+  env.fog.color = s.fogColor;
+  env.fog.far = s.fogFar;
+  env.fog.near = s.fogNear;
+  env.fog.offset = s.fogOffset;
+  env.fog.steepness = s.fogSteepness;
+  env.skybox.sunBrightness = s.sunBrightness;
+  env.skybox.sunSize = s.sunSize;
+  env.skyColor = s.skyColor;
+  env.lightDirection = s.lightDirection;
+  env.lightColor = s.lightColor;
+}
+
+void extractEnvironment(data& s, const Environment& env) {
+  s.enableFog = env.fog.enabled;
+  s.fogColor = env.fog.color;
+  s.fogFar = env.fog.far;
+  s.fogNear = env.fog.near;
+  s.fogOffset = env.fog.offset;
+  s.fogSteepness = env.fog.steepness;
+  s.sunBrightness = env.skybox.sunBrightness;
+  s.sunSize = env.skybox.sunSize;
+  s.skyColor = env.skyColor;
+  s.lightDirection = env.lightDirection;
+  s.lightColor = env.lightColor;
+}
+
+void applyAll(const data& s, Water& water, Environment& env) {
+  applyWater(s, water);
+  applyEnvironment(s, env);
+}
+
+void extractAll(data& s, const Water& water, const Environment& env) {
+  extractWater(s, water);
+  extractEnvironment(s, env);
+}
+
+} // namespace setting

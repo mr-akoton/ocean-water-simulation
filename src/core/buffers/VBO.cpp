@@ -1,6 +1,5 @@
-#include "glad/glad.h"
-#include "glm/ext/vector_float4.hpp"
-#include <core/Object.hpp>
+#include <glad/glad.h>
+#include <core/buffers/VBO.hpp>
 
 /* ========================================================================== */
 /*                          CONTRUCTOR AND DESTRUCTOR                         */

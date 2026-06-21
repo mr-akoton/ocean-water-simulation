@@ -1,12 +1,8 @@
 #ifndef WINDOW_HPP
 #define WINDOW_HPP
 
-#include <imgui/imgui_impl_glfw.h>
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
 #include <glm/glm.hpp>
-
 #include <unordered_map>
 
 class Window {

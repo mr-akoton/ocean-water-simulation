@@ -2,14 +2,8 @@
 #define TEXTURE_HPP
 
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 #include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <stb/stb_image.h>
-
 #include <core/Shader.hpp>
-
 #include <string>
 
 class Texture {
