@@ -93,7 +93,11 @@ void Water::render(Camera& camera, Environment& environment) const {
   _vao.bind();
 
   shader.enable();
+
   camera.updateShaderMatrix(shader, "u_projection");
+  camera.updateFrustumPlane(shader);
+  shader.setFloat("u_heightMax", (amplitude / (1.0f - amplitudeMult)) * 1.1f);
+
   shader.setVec3("u_color", color);
   shader.setMat4("u_model", model);
   shader.setMat3("u_imodel", imodel);
