@@ -1,17 +1,21 @@
-#include <core/Object.hpp>
+#include <glad/glad.h>
+#include <core/buffers/RBO.hpp>
 
 /* ========================================================================== */
 /*                          CONTRUCTOR AND DESTRUCTOR                         */
 /* ========================================================================== */
 
-FBO::FBO() { glGenFramebuffers(1, &_id); }
+RBO::RBO(int width, int height) {
+  glCreateRenderbuffers(1, &_id);
+  glNamedRenderbufferStorage(_id, GL_DEPTH24_STENCIL8, width, height);
+}
 
-FBO::~FBO() { glDeleteFramebuffers(1, &_id); }
+RBO::~RBO() { glDeleteRenderbuffers(1, &_id); }
 
 /* ========================================================================== */
 /*                                   BINDER                                   */
 /* ========================================================================== */
 
-void FBO::bind(void) const { glBindFramebuffer(GL_FRAMEBUFFER, _id); }
+void RBO::bind(void) const { glBindRenderbuffer(GL_RENDERBUFFER, _id); }
 
-void FBO::unbind(void) const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
+void RBO::unbind(void) const { glBindRenderbuffer(GL_RENDERBUFFER, 0); }

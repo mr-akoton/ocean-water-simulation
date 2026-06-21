@@ -1,3 +1,8 @@
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtx/vector_angle.hpp>
 #include <components/Camera.hpp>
 
 using namespace glm;
@@ -103,4 +108,23 @@ void Camera::updateMatrix(float fov, float near, float far) {
 void Camera::updateShaderMatrix(const Shader& shader,
                                 const std::string uniform) const {
   shader.setMat4(uniform, matrix);
+}
+
+static vec4 normalizePlane(vec4 plane) {
+  float len = length(vec3(plane));
+  return plane / len;
+}
+
+void Camera::updateFrustumPlane(const Shader& shader) const {
+  glm::vec4 row0(matrix[0][0], matrix[1][0], matrix[2][0], matrix[3][0]);
+  glm::vec4 row1(matrix[0][1], matrix[1][1], matrix[2][1], matrix[3][1]);
+  glm::vec4 row2(matrix[0][2], matrix[1][2], matrix[2][2], matrix[3][2]);
+  glm::vec4 row3(matrix[0][3], matrix[1][3], matrix[2][3], matrix[3][3]);
+
+  shader.setVec4("u_FPLeft", normalizePlane(row3 + row0));
+  shader.setVec4("u_FPRight", normalizePlane(row3 - row0));
+  shader.setVec4("u_FPBottom", normalizePlane(row3 + row1));
+  shader.setVec4("u_FPTop", normalizePlane(row3 - row1));
+  shader.setVec4("u_FPNear", normalizePlane(row3 + row2));
+  shader.setVec4("u_FPFar", normalizePlane(row3 - row2));
 }

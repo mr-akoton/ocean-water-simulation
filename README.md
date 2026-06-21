@@ -1,6 +1,6 @@
 # Water Simulation
 
-A procedural water simulation and renderer written in **C++17** using **OpenGL 3.3**.  
+A procedural water simulation and renderer written in **C++17** using **OpenGL 4.6**.  
 Built to explore and understand sinewave-based ocean surfaces, skybox rendering, and post-processing effects in modern OpenGL.
 
 ---
@@ -50,7 +50,7 @@ This project is developed and tested on **Linux only**. Building on other operat
 
 You will need:
 - A **C++17** compatible compiler (e.g. `g++` or `clang++`)
-- An **OpenGL 3.3** compatible GPU and drivers
+- An **OpenGL 4.6** compatible GPU and drivers
 - **GLFW3** installed system-wide (`libglfw3-dev` on Debian/Ubuntu)
 - **Make** build tool
 

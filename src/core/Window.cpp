@@ -1,3 +1,5 @@
+#include <glad/glad.h>
+#include <imgui/imgui_impl_glfw.h>
 #include <core/Window.hpp>
 
 using namespace glm;

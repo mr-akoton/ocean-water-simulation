@@ -2,12 +2,12 @@
 #define CUBE_MAP_HPP
 
 #include <glm/glm.hpp>
-#include <stb/stb_image.h>
-
+#include <glad/glad.h>
 #include <components/Camera.hpp>
+#include <core/buffers/VAO.hpp>
+#include <core/buffers/VBO.hpp>
+#include <core/buffers/EBO.hpp>
 #include <core/Shader.hpp>
-#include <core/Object.hpp>
-
 #include <vector>
 
 class Environment;

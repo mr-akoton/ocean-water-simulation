@@ -17,10 +17,6 @@ RES_DIR		:= ./resources
 SETTINGS	:= ./settings.json
 IMGUI		:= ./imgui.ini
 
-BLD_DIR		:= ./build
-SHD_DIR		:= ./shader
-RES_DIR		:= ./resources
-
 ARCH_NAME	:= $(NAME)-v$(VERSION)
 BUILD_TYPE	?= debug
 
@@ -66,11 +62,11 @@ SRC_FILE	:= components/Camera.cpp \
 			   components/Environment.cpp \
 			   components/Interface.cpp \
 			   components/Water.cpp \
-			   core/objects/EBO.cpp \
-			   core/objects/FBO.cpp \
-			   core/objects/RBO.cpp \
-			   core/objects/VAO.cpp \
-			   core/objects/VBO.cpp \
+			   core/buffers/EBO.cpp \
+			   core/buffers/FBO.cpp \
+			   core/buffers/RBO.cpp \
+			   core/buffers/VAO.cpp \
+			   core/buffers/VBO.cpp \
 			   core/Engine.cpp \
 			   core/Shader.cpp \
 			   core/Texture.cpp \
@@ -78,6 +74,8 @@ SRC_FILE	:= components/Camera.cpp \
 			   effects/Fog.cpp \
 			   settings/SettingsData.cpp \
 			   settings/SettingsManager.cpp \
+			   settings/SettingsSerializer.cpp \
+			   settings/SettingsPanel.cpp \
 			   main.cpp
 
 SRC_CXX		:= $(addprefix $(EXT_DIR)/, $(EXT_FILE)) \

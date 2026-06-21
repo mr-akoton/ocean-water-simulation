@@ -22,6 +22,10 @@ void setting::to_json(nlohmann::json& j, const setting::data& s) {
            {"ambientStrength", s.ambientStrength},
            {"specularStrength", s.specularStrength},
            {"shininess", s.shininess},
+           {"minDivision", s.minDivision},
+           {"maxDivision", s.maxDivision},
+           {"minDistance", s.minDistance},
+           {"maxDistance", s.maxDistance},
 
            {"skyColor", s.skyColor},
            {"lightColor", s.lightColor},
@@ -39,37 +43,46 @@ void setting::to_json(nlohmann::json& j, const setting::data& s) {
 };
 
 void setting::from_json(const nlohmann::json& j, setting::data& s) {
-  j.at("waterColor").get_to(s.waterColor);
-  j.at("iterations").get_to(s.iteration);
-  j.at("amplitude").get_to(s.amplitude);
-  j.at("frequency").get_to(s.frequency);
-  j.at("speed").get_to(s.speed);
-  j.at("drag").get_to(s.drag);
-  j.at("peakMax").get_to(s.peakMax);
-  j.at("peakOffset").get_to(s.peakOffset);
-  j.at("amplitudeMult").get_to(s.amplitudeMult);
-  j.at("frequencyMult").get_to(s.frequencyMult);
-  j.at("speedMult").get_to(s.speedMult);
-  j.at("iterationMult").get_to(s.iterationMult);
-  j.at("ambientColor").get_to(s.ambientColor);
-  j.at("ambientStrength").get_to(s.ambientStrength);
-  j.at("specularStrength").get_to(s.specularStrength);
-  j.at("shininess").get_to(s.shininess);
+  get_optional(j, "waterColor", s.waterColor);
 
-  j.at("skyColor").get_to(s.skyColor);
-  j.at("lightColor").get_to(s.lightColor);
-  j.at("lightDirection").get_to(s.lightDirection);
+  get_optional(j, "iterations", s.iteration);
+  get_optional(j, "amplitude", s.amplitude);
+  get_optional(j, "frequency", s.frequency);
+  get_optional(j, "speed", s.speed);
+  get_optional(j, "drag", s.drag);
 
-  j.at("sunSize").get_to(s.sunSize);
-  j.at("sunBrightness").get_to(s.sunBrightness);
+  get_optional(j, "peakMax", s.peakMax);
+  get_optional(j, "peakOffset", s.peakOffset);
 
-  j.at("enableFog").get_to(s.enableFog);
-  j.at("fogColor").get_to(s.fogColor);
-  j.at("fogNear").get_to(s.fogNear);
-  j.at("fogFar").get_to(s.fogFar);
-  j.at("fogSteepness").get_to(s.fogSteepness);
-  j.at("fogOffset").get_to(s.fogOffset);
-};
+  get_optional(j, "amplitudeMult", s.amplitudeMult);
+  get_optional(j, "frequencyMult", s.frequencyMult);
+  get_optional(j, "speedMult", s.speedMult);
+  get_optional(j, "iterationMult", s.iterationMult);
+
+  get_optional(j, "ambientColor", s.ambientColor);
+  get_optional(j, "ambientStrength", s.ambientStrength);
+  get_optional(j, "specularStrength", s.specularStrength);
+  get_optional(j, "shininess", s.shininess);
+
+  get_optional(j, "minDivision", s.minDivision);
+  get_optional(j, "maxDivision", s.maxDivision);
+  get_optional(j, "minDistance", s.minDistance);
+  get_optional(j, "maxDistance", s.maxDistance);
+
+  get_optional(j, "skyColor", s.skyColor);
+  get_optional(j, "lightColor", s.lightColor);
+  get_optional(j, "lightDirection", s.lightDirection);
+
+  get_optional(j, "sunSize", s.sunSize);
+  get_optional(j, "sunBrightness", s.sunBrightness);
+
+  get_optional(j, "enableFog", s.enableFog);
+  get_optional(j, "fogColor", s.fogColor);
+  get_optional(j, "fogNear", s.fogNear);
+  get_optional(j, "fogFar", s.fogFar);
+  get_optional(j, "fogSteepness", s.fogSteepness);
+  get_optional(j, "fogOffset", s.fogOffset);
+}
 
 bool SettingsManager::save(const std::string& filepath,
                            const setting::data& settings) {

@@ -2,21 +2,20 @@
 #define SHADER_HPP
 
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 #include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 #include <string>
 
 class Shader {
 private:
   GLuint _id;
   std::string _vertexShaderFile;
+  std::string _tesControlShaderFile;
+  std::string _tesEvalShaderFile;
   std::string _fragmentShaderFile;
 
 public:
-  Shader(const std::string vertex, const std::string fragment);
+  Shader(const std::string vertex, const std::string fragment,
+         const std::string tesControl = "", const std::string tesEval = "");
   ~Shader();
 
   void enable(void) const;

@@ -1,19 +1,7 @@
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
 
-#ifndef GLM_ENABLE_EXPERIMENTAL
-#define GLM_ENABLE_EXPERIMENTAL
-#endif
-
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/rotate_vector.hpp>
-#include <glm/gtx/vector_angle.hpp>
-
 #include <core/Shader.hpp>
 #include <core/Window.hpp>
 
@@ -39,6 +27,7 @@ public:
   void updateMatrix(float fov, float near, float far);
   void updateShaderMatrix(const Shader& shader,
                           const std::string uniform) const;
+  void updateFrustumPlane(const Shader& shader) const;
   glm::mat4 getView(void) const;
   glm::mat4 getProjection(float fov, float near, float far) const;
 

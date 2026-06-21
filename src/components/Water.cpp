@@ -1,8 +1,17 @@
+#include <glad/glad.h>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
+#include <core/Config.hpp>
+#include <core/buffers/EBO.hpp>
+#include <core/buffers/VBO.hpp>
 #include <components/Water.hpp>
-#include <settings/SettingsData.hpp>
 
 static const char* VERTEX_SHADER = "shader/water-vertex.glsl";
 static const char* FRAGMENT_SHADER = "shader/water-fragment.glsl";
+static const char* TESS_CONTROL_SHADER = "shader/water-tess-control.glsl";
+static const char* TESS_EVAL_SHADER = "shader/water-tess-eval.glsl";
 
 using namespace glm;
 
@@ -16,8 +25,11 @@ Water::Water(unsigned int width, unsigned int height, float gridSize)
       peakOffset(1.0), amplitudeMult(0.82), frequencyMult(1.18),
       speedMult(1.07), iterationMult(1.18), ambientColor(1.0f),
       ambientStrength(0.4), specularStrength(1.0), shininess(256),
-      position(0.0f), color(0.629f, 0.883f, 0.917f), model(1.0f), imodel(1.0f),
-      shader(VERTEX_SHADER, FRAGMENT_SHADER), _indicesCount(0) {
+      minDivision(2.0), maxDivision(32.0), minDistance(1.0),
+      maxDistance(1000.0), position(0.0f), color(0.629f, 0.883f, 0.917f),
+      model(1.0f), imodel(1.0f), shader(VERTEX_SHADER, FRAGMENT_SHADER,
+                                        TESS_CONTROL_SHADER, TESS_EVAL_SHADER),
+      _indicesCount(0) {
   model = translate(model, position);
   imodel = transpose(inverse(mat3(model)));
 
@@ -27,12 +39,13 @@ Water::Water(unsigned int width, unsigned int height, float gridSize)
     iter += iterationMult;
   }
 
-  glGenTextures(1, &_directionTexture);
-  glBindTexture(GL_TEXTURE_1D, _directionTexture);
-  glTexImage1D(GL_TEXTURE_1D, 0, GL_RG32F, MAX_WAVE_ITERATION, 0, GL_RG,
-               GL_FLOAT, waveDirections.data());
-  glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glCreateTextures(GL_TEXTURE_1D, 1, &_directionTexture);
+  glTextureStorage1D(_directionTexture, 1, GL_RG32F, MAX_WAVE_ITERATION);
+  glTextureSubImage1D(_directionTexture, 0, 0, MAX_WAVE_ITERATION, GL_RG,
+                      GL_FLOAT, waveDirections.data());
+
+  glTextureParameteri(_directionTexture, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTextureParameteri(_directionTexture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
   shader.enable();
   shader.setInt("u_skybox", 0);
@@ -55,9 +68,6 @@ void Water::init() {
 
         _indices.push_back(i);
         _indices.push_back(i + width);
-        _indices.push_back(i + 1);
-
-        _indices.push_back(i + width);
         _indices.push_back(i + width + 1);
         _indices.push_back(i + 1);
       }
@@ -66,17 +76,12 @@ void Water::init() {
 
   _indicesCount = _indices.size();
 
-  _vao.bind();
   _vbo.bindData(_vertices);
-  _vbo.bind();
   _ebo.bindData(_indices);
-  _ebo.bind();
 
-  _vao.linkAttribute(_vbo, 0, 2, GL_FLOAT, sizeof(glm::vec2), (void*)(0));
-
-  _vao.unbind();
-  _vbo.unbind();
-  _ebo.unbind();
+  _vao.linkAttribute(0, 2, GL_FLOAT, 0);
+  _vao.linkVBO(_vbo, 0, 0, sizeof(glm::vec2));
+  _vao.linkEBO(_ebo);
 
   _vertices.clear();
   _vertices.shrink_to_fit();
@@ -92,7 +97,11 @@ void Water::render(Camera& camera, Environment& environment) const {
   _vao.bind();
 
   shader.enable();
+
   camera.updateShaderMatrix(shader, "u_projection");
+  camera.updateFrustumPlane(shader);
+  shader.setFloat("u_heightMax", (amplitude / (1.0f - amplitudeMult)) * 1.1f);
+
   shader.setVec3("u_color", color);
   shader.setMat4("u_model", model);
   shader.setMat3("u_imodel", imodel);
@@ -117,9 +126,14 @@ void Water::render(Camera& camera, Environment& environment) const {
   shader.setFloat("u_specularStrength", specularStrength);
   shader.setInt("u_shininess", shininess);
 
+  shader.setFloat("u_minDivision", minDivision);
+  shader.setFloat("u_maxDivision", maxDivision);
+  shader.setFloat("u_minDistance", minDistance);
+  shader.setFloat("u_maxDistance", maxDistance);
+
   shader.setFloat("u_time", glfwGetTime());
 
-  glBindTexture(GL_TEXTURE_1D, _directionTexture);
-
-  glDrawElements(GL_TRIANGLES, _indicesCount, GL_UNSIGNED_INT, 0);
+  glBindTextureUnit(0, environment.skybox.texture);
+  glBindTextureUnit(1, _directionTexture);
+  glDrawElements(GL_PATCHES, _indicesCount, GL_UNSIGNED_INT, 0);
 }
