@@ -2,7 +2,7 @@
 # VARIABLES
 
 NAME		:= water-simulation
-VERSION		:= 0.2.0
+VERSION		:= 0.3.0
 
 SRC_DIR		:= ./src
 INC_DIR		:= ./inc
