@@ -31,10 +31,10 @@ public:
   float speedMult;
   float iterationMult;
 
-  glm::vec3 ambientColor;
-  float ambientStrength;
-  float specularStrength;
-  int shininess;
+  glm::vec3 emissivity;
+  glm::vec3 baseReflectance;
+  float roughness;
+  float metallic;
 
   float minDivision;
   float maxDivision;

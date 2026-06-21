@@ -61,5 +61,9 @@ void main() {
         finalColor = mix(finalColor, u_fogColor, fogFactor);
     }
 
+    // Tone mapping and gamma correction
+    // finalColor = finalColor / (finalColor + vec3(1.0));
+    // finalColor = pow(finalColor, vec3(1.0 / 2.2));
+
     FragColor = vec4(finalColor, 1.0);
 }

@@ -23,12 +23,12 @@ Water::Water(unsigned int width, unsigned int height, float gridSize)
     : width(width), height(height), gridSize(gridSize), iteration(32),
       amplitude(8.0), frequency(0.02), speed(1.4), drag(1.4), peakMax(1.0),
       peakOffset(1.0), amplitudeMult(0.82), frequencyMult(1.18),
-      speedMult(1.07), iterationMult(1.18), ambientColor(1.0f),
-      ambientStrength(0.4), specularStrength(1.0), shininess(256),
-      minDivision(2.0), maxDivision(32.0), minDistance(1.0),
-      maxDistance(1000.0), position(0.0f), color(0.629f, 0.883f, 0.917f),
-      model(1.0f), imodel(1.0f), shader(VERTEX_SHADER, FRAGMENT_SHADER,
-                                        TESS_CONTROL_SHADER, TESS_EVAL_SHADER),
+      speedMult(1.07), iterationMult(1.18), emissivity(0.0),
+      baseReflectance(0.0), roughness(0.0), metallic(0.0), minDivision(2.0),
+      maxDivision(32.0), minDistance(1.0), maxDistance(1000.0), position(0.0f),
+      color(0.629f, 0.883f, 0.917f), model(1.0f), imodel(1.0f),
+      shader(VERTEX_SHADER, FRAGMENT_SHADER, TESS_CONTROL_SHADER,
+             TESS_EVAL_SHADER),
       _indicesCount(0) {
   model = translate(model, position);
   imodel = transpose(inverse(mat3(model)));
@@ -121,10 +121,10 @@ void Water::render(Camera& camera, Environment& environment) const {
   shader.setFloat("u_frequencyMult", frequencyMult);
   shader.setFloat("u_speedMult", speedMult);
 
-  shader.setFloat("u_ambientStrength", ambientStrength);
-  shader.setVec3("u_ambientColor", ambientColor);
-  shader.setFloat("u_specularStrength", specularStrength);
-  shader.setInt("u_shininess", shininess);
+  shader.setVec3("u_emissivity", emissivity);
+  shader.setVec3("u_baseReflectance", baseReflectance);
+  shader.setFloat("u_roughness", roughness);
+  shader.setFloat("u_metallic", metallic);
 
   shader.setFloat("u_minDivision", minDivision);
   shader.setFloat("u_maxDivision", maxDivision);

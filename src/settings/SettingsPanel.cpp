@@ -46,12 +46,11 @@ bool SettingsPanel::render(Water& water, Environment& environment,
       }
 
       if (ImGui::CollapsingHeader("Materials")) {
-        ImGui::ColorEdit3("Ambient Color", glm::value_ptr(water.ambientColor));
-        ImGui::SliderFloat("Ambient Strength", &water.ambientStrength, 0.0f,
-                           1.0f, "%.2f");
-        ImGui::SliderFloat("Specular Strength", &water.specularStrength, 0.0f,
-                           1.0f, "%.2f");
-        ImGui::InputInt("Shininess", &water.shininess);
+        ImGui::ColorEdit3("Emissivity", glm::value_ptr(water.emissivity));
+        ImGui::ColorEdit3("Base Reflectance",
+                          glm::value_ptr(water.baseReflectance));
+        ImGui::SliderFloat("Roughness", &water.roughness, 0.0f, 1.0f, "%.5f");
+        ImGui::SliderFloat("Metallic", &water.metallic, 0.0f, 1.0f, "%.5f");
       }
 
       if (ImGui::CollapsingHeader("Tessellation")) {

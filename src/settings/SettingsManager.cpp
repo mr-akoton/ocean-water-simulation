@@ -18,10 +18,10 @@ void setting::to_json(nlohmann::json& j, const setting::data& s) {
            {"frequencyMult", s.frequencyMult},
            {"speedMult", s.speedMult},
            {"iterationMult", s.iterationMult},
-           {"ambientColor", s.ambientColor},
-           {"ambientStrength", s.ambientStrength},
-           {"specularStrength", s.specularStrength},
-           {"shininess", s.shininess},
+           {"emissivity", s.emissivity},
+           {"baseReflectance", s.baseReflectance},
+           {"roughness", s.roughness},
+           {"metallic", s.metallic},
            {"minDivision", s.minDivision},
            {"maxDivision", s.maxDivision},
            {"minDistance", s.minDistance},
@@ -59,10 +59,10 @@ void setting::from_json(const nlohmann::json& j, setting::data& s) {
   get_optional(j, "speedMult", s.speedMult);
   get_optional(j, "iterationMult", s.iterationMult);
 
-  get_optional(j, "ambientColor", s.ambientColor);
-  get_optional(j, "ambientStrength", s.ambientStrength);
-  get_optional(j, "specularStrength", s.specularStrength);
-  get_optional(j, "shininess", s.shininess);
+  get_optional(j, "emissivity", s.emissivity);
+  get_optional(j, "baseReflectance", s.baseReflectance);
+  get_optional(j, "roughness", s.roughness);
+  get_optional(j, "metallic", s.metallic);
 
   get_optional(j, "minDivision", s.minDivision);
   get_optional(j, "maxDivision", s.maxDivision);

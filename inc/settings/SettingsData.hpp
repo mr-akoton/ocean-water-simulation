@@ -24,10 +24,10 @@ struct data {
   float frequencyMult{1.18f};
   float speedMult{1.07f};
   float iterationMult{1.18f};
-  glm::vec3 ambientColor{1.0f, 1.0f, 1.0f};
-  float ambientStrength{0.4f};
-  float specularStrength{1.0f};
-  int shininess{256};
+  glm::vec3 emissivity{0.0f};
+  glm::vec3 baseReflectance{0.0f};
+  float roughness{0.0f};
+  float metallic{0.0f};
   float minDivision{2.0};
   float maxDivision{32.0};
   float minDistance{1.0};
