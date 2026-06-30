@@ -21,6 +21,7 @@ uniform float u_scatterDistortion;
 in vec3 p_fragPosition;
 in vec3 p_color;
 in vec3 p_normal;
+in float p_jacobian;
 
 out vec4 FragColor;
 
@@ -84,11 +85,15 @@ vec3 getLight(vec3 color) {
     vec3 LT = normalize(L + N * u_scatterDistortion);
 
     float viewScatter = pow(max(dot(V, -LT), 0.0), u_scatterPower);
-    float backlit = pow(max(0.0, 0.5 - 0.5 * dot(L, N)), 3.0);
+    float backlit = pow(max(0.0, 0.5 - 0.5 * max(dot(L, N), -0.2)), 2.0);
 
     vec3 scatter = waveHeight * viewScatter * backlit * u_scatterStrength * u_scatterColor * u_lightColor;
 
-    return light + reflection + scatter;
+    // Sea foam
+    float foamFromJacobian = 1.0 - smoothstep(0.0, 1.0, p_jacobian);
+    vec3 foam = foamFromJacobian * vec3(1.0);
+
+    return light + reflection + scatter + foam;
 }
 
 void main() {
