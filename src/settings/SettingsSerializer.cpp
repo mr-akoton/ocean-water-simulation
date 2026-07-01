@@ -25,6 +25,10 @@ void applyWater(const data& s, Water& water) {
   water.scatterStrength = s.scatterStrength;
   water.scatterPower = s.scatterPower;
   water.scatterDistortion = s.scatterDistortion;
+  water.foamColor = s.foamColor;
+  water.foamHeight = s.foamHeight;
+  water.foamSteepness = s.foamSteepness;
+  water.foamJacobian = s.foamJacobian;
   water.minDivision = s.minDivision;
   water.maxDivision = s.maxDivision;
   water.minDistance = s.minDistance;
@@ -52,6 +56,10 @@ void extractWater(data& s, const Water& water) {
   s.scatterStrength = water.scatterStrength;
   s.scatterPower = water.scatterPower;
   s.scatterDistortion = water.scatterDistortion;
+  s.foamColor = water.foamColor;
+  s.foamHeight = water.foamHeight;
+  s.foamJacobian = water.foamJacobian;
+  s.foamSteepness = water.foamSteepness;
   s.minDivision = water.minDivision;
   s.maxDivision = water.maxDivision;
   s.minDistance = water.minDistance;

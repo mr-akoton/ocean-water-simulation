@@ -29,6 +29,7 @@ out vec3 p_fragPosition;
 out vec3 p_color;
 out vec3 p_normal;
 out float p_jacobian;
+out vec2 p_derivative;
 
 // Fractal wave synthesis (FBM-like sum of directional exponential waves)
 //
@@ -122,6 +123,7 @@ void main() {
 
     gl_Position = u_projection * worldPosition;
     p_fragPosition = worldPosition.xyz;
+    p_derivative = waves.xz;
     p_jacobian = waves.w;
     p_normal = normalize(u_imodel * normal);
     p_color = u_color;

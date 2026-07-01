@@ -18,10 +18,16 @@ uniform float u_scatterStrength;
 uniform float u_scatterPower;
 uniform float u_scatterDistortion;
 
+uniform vec3 u_foamColor;
+uniform float u_foamHeight;
+uniform float u_foamSteepness;
+uniform float u_foamJacobian;
+
 in vec3 p_fragPosition;
 in vec3 p_color;
 in vec3 p_normal;
 in float p_jacobian;
+in vec2 p_derivative;
 
 out vec4 FragColor;
 
@@ -91,7 +97,9 @@ vec3 getLight(vec3 color) {
 
     // Sea foam
     float foamFromJacobian = 1.0 - smoothstep(0.0, 1.0, p_jacobian);
-    vec3 foam = foamFromJacobian * vec3(1.0);
+    float foamFromSteepness = length(p_derivative);
+    float foamCrest = (u_foamSteepness * foamFromSteepness + u_foamJacobian * foamFromJacobian) * smoothstep(u_foamHeight, 1.0, p_fragPosition.y / u_heightMax);
+    vec3 foam = foamCrest * u_foamColor;
 
     return light + reflection + scatter + foam;
 }

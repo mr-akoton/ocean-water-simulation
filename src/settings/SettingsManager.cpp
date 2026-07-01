@@ -26,6 +26,10 @@ void setting::to_json(nlohmann::json& j, const setting::data& s) {
            {"scatterStrength", s.scatterStrength},
            {"scatterPower", s.scatterPower},
            {"scatterDistortion", s.scatterDistortion},
+           {"foamColor", s.foamColor},
+           {"foamHeight", s.foamHeight},
+           {"foamJacobian", s.foamJacobian},
+           {"foamSteepness", s.foamSteepness},
            {"minDivision", s.minDivision},
            {"maxDivision", s.maxDivision},
            {"minDistance", s.minDistance},
@@ -68,6 +72,11 @@ void setting::from_json(const nlohmann::json& j, setting::data& s) {
   get_optional(j, "scatterStrength", s.scatterStrength);
   get_optional(j, "scatterPower", s.scatterPower);
   get_optional(j, "scatterDistortion", s.scatterDistortion);
+  get_optional(j, "foamColor", s.foamColor);
+  get_optional(j, "foamHeight", s.foamHeight);
+  get_optional(j, "foamSteepness", s.foamSteepness);
+  get_optional(j, "foamJacobian", s.foamJacobian);
+
   get_optional(j, "minDivision", s.minDivision);
   get_optional(j, "maxDivision", s.maxDivision);
   get_optional(j, "minDistance", s.minDistance);

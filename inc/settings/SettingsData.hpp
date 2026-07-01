@@ -32,6 +32,10 @@ struct data {
   float scatterStrength{0.5f};
   float scatterPower{2.0f};
   float scatterDistortion{0.4f};
+  glm::vec3 foamColor{1.0f};
+  float foamHeight{0.0f};
+  float foamSteepness{1.0f};
+  float foamJacobian{1.0f};
   float minDivision{2.0};
   float maxDivision{32.0};
   float minDistance{1.0};

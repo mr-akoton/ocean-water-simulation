@@ -42,6 +42,11 @@ public:
   float scatterPower;
   float scatterDistortion;
 
+  glm::vec3 foamColor;
+  float foamHeight;
+  float foamSteepness;
+  float foamJacobian;
+
   float minDivision;
   float maxDivision;
   float minDistance;

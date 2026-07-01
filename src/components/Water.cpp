@@ -26,8 +26,9 @@ Water::Water(unsigned int width, unsigned int height, float gridSize)
       speedMult(1.07), iterationMult(1.18), emissivity(0.0),
       baseReflectance(0.0), roughness(0.0), metallic(0.0),
       scatterColor(0.0, 0.8, 0.2), scatterStrength(0.5), scatterPower(2.0),
-      scatterDistortion(0.4), minDivision(2.0), maxDivision(32.0),
-      minDistance(1.0), maxDistance(1000.0), position(0.0f),
+      scatterDistortion(0.4), foamColor(1.0), foamHeight(0.0),
+      foamSteepness(1.0), foamJacobian(1.0), minDivision(2.0),
+      maxDivision(32.0), minDistance(1.0), maxDistance(1000.0), position(0.0f),
       color(0.629f, 0.883f, 0.917f), model(1.0f), imodel(1.0f),
       shader(VERTEX_SHADER, FRAGMENT_SHADER, TESS_CONTROL_SHADER,
              TESS_EVAL_SHADER),
@@ -131,6 +132,10 @@ void Water::render(Camera& camera, Environment& environment) const {
   shader.setFloat("u_scatterStrength", scatterStrength);
   shader.setFloat("u_scatterPower", scatterPower);
   shader.setFloat("u_scatterDistortion", scatterDistortion);
+  shader.setVec3("u_foamColor", foamColor);
+  shader.setFloat("u_foamHeight", foamHeight);
+  shader.setFloat("u_foamSteepness", foamSteepness);
+  shader.setFloat("u_foamJacobian", foamJacobian);
 
   shader.setFloat("u_minDivision", minDivision);
   shader.setFloat("u_maxDivision", maxDivision);
