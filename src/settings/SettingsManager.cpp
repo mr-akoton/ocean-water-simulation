@@ -18,10 +18,18 @@ void setting::to_json(nlohmann::json& j, const setting::data& s) {
            {"frequencyMult", s.frequencyMult},
            {"speedMult", s.speedMult},
            {"iterationMult", s.iterationMult},
-           {"ambientColor", s.ambientColor},
-           {"ambientStrength", s.ambientStrength},
-           {"specularStrength", s.specularStrength},
-           {"shininess", s.shininess},
+           {"emissivity", s.emissivity},
+           {"baseReflectance", s.baseReflectance},
+           {"roughness", s.roughness},
+           {"metallic", s.metallic},
+           {"scatterColor", s.scatterColor},
+           {"scatterStrength", s.scatterStrength},
+           {"scatterPower", s.scatterPower},
+           {"scatterDistortion", s.scatterDistortion},
+           {"foamColor", s.foamColor},
+           {"foamHeight", s.foamHeight},
+           {"foamJacobian", s.foamJacobian},
+           {"foamSteepness", s.foamSteepness},
            {"minDivision", s.minDivision},
            {"maxDivision", s.maxDivision},
            {"minDistance", s.minDistance},
@@ -50,19 +58,24 @@ void setting::from_json(const nlohmann::json& j, setting::data& s) {
   get_optional(j, "frequency", s.frequency);
   get_optional(j, "speed", s.speed);
   get_optional(j, "drag", s.drag);
-
   get_optional(j, "peakMax", s.peakMax);
   get_optional(j, "peakOffset", s.peakOffset);
-
   get_optional(j, "amplitudeMult", s.amplitudeMult);
   get_optional(j, "frequencyMult", s.frequencyMult);
   get_optional(j, "speedMult", s.speedMult);
   get_optional(j, "iterationMult", s.iterationMult);
-
-  get_optional(j, "ambientColor", s.ambientColor);
-  get_optional(j, "ambientStrength", s.ambientStrength);
-  get_optional(j, "specularStrength", s.specularStrength);
-  get_optional(j, "shininess", s.shininess);
+  get_optional(j, "emissivity", s.emissivity);
+  get_optional(j, "baseReflectance", s.baseReflectance);
+  get_optional(j, "roughness", s.roughness);
+  get_optional(j, "metallic", s.metallic);
+  get_optional(j, "scatterColor", s.scatterColor);
+  get_optional(j, "scatterStrength", s.scatterStrength);
+  get_optional(j, "scatterPower", s.scatterPower);
+  get_optional(j, "scatterDistortion", s.scatterDistortion);
+  get_optional(j, "foamColor", s.foamColor);
+  get_optional(j, "foamHeight", s.foamHeight);
+  get_optional(j, "foamSteepness", s.foamSteepness);
+  get_optional(j, "foamJacobian", s.foamJacobian);
 
   get_optional(j, "minDivision", s.minDivision);
   get_optional(j, "maxDivision", s.maxDivision);

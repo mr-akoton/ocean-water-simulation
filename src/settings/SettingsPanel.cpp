@@ -25,10 +25,10 @@ bool SettingsPanel::render(Water& water, Environment& environment,
 
       if (ImGui::CollapsingHeader("Wave Parameters",
                                   ImGuiTreeNodeFlags_DefaultOpen)) {
-        ImGui::SliderFloat("Amplitude", &water.amplitude, 0.0f, 20.0f, "%.2f");
-        ImGui::SliderFloat("Frequency", &water.frequency, 0.0f, 1.0f, "%.3f");
-        ImGui::SliderFloat("Speed", &water.speed, 0.0f, 10.0f, "%.2f");
-        ImGui::SliderFloat("Drag", &water.drag, 0.0f, 5.0f, "%.2f");
+        ImGui::DragFloat("Amplitude", &water.amplitude, 0.01f, 0.0f, 20.0f);
+        ImGui::DragFloat("Frequency", &water.frequency, 0.001f, 0.0f, 1.0f);
+        ImGui::DragFloat("Speed", &water.speed, 0.01f, 0.0f, 10.0f);
+        ImGui::DragFloat("Drag", &water.drag, 0.01f, 0.0f, 5.0f);
       }
 
       if (ImGui::CollapsingHeader("Wave Shaping",
@@ -46,12 +46,28 @@ bool SettingsPanel::render(Water& water, Environment& environment,
       }
 
       if (ImGui::CollapsingHeader("Materials")) {
-        ImGui::ColorEdit3("Ambient Color", glm::value_ptr(water.ambientColor));
-        ImGui::SliderFloat("Ambient Strength", &water.ambientStrength, 0.0f,
-                           1.0f, "%.2f");
-        ImGui::SliderFloat("Specular Strength", &water.specularStrength, 0.0f,
-                           1.0f, "%.2f");
-        ImGui::InputInt("Shininess", &water.shininess);
+        ImGui::SeparatorText("PBR");
+        ImGui::ColorEdit3("Emissivity", glm::value_ptr(water.emissivity));
+        ImGui::ColorEdit3("Base Reflectance",
+                          glm::value_ptr(water.baseReflectance));
+        ImGui::DragFloat("Roughness", &water.roughness, 0.01f, 0.0f, 1.0f);
+        ImGui::DragFloat("Metallic", &water.metallic, 0.01f, 0.0f, 1.0f);
+        ImGui::SeparatorText("Scatter");
+        ImGui::ColorEdit3("Scatter Color", glm::value_ptr(water.scatterColor));
+        ImGui::DragFloat("Scatter Strength", &water.scatterStrength, 0.01f,
+                         0.0f, 10.0f);
+        ImGui::DragFloat("Scatter Power", &water.scatterPower, 1.0f, 1.0f,
+                         32.0f);
+        ImGui::DragFloat("Scatter Distortion", &water.scatterDistortion, 0.01f,
+                         0.0f, 1.0f);
+        ImGui::SeparatorText("Foam");
+        ImGui::ColorEdit3("Foam Color", glm::value_ptr(water.foamColor));
+
+        ImGui::DragFloat("Foam Height", &water.foamHeight, 0.01f, 0.0f, 1.0f);
+        ImGui::DragFloat("Foam Steepness", &water.foamSteepness, 0.01f, 0.0f,
+                         10.0f);
+        ImGui::DragFloat("Foam Jacobian", &water.foamJacobian, 0.01f, 0.0f,
+                         10.0f);
       }
 
       if (ImGui::CollapsingHeader("Tessellation")) {
@@ -67,8 +83,8 @@ bool SettingsPanel::render(Water& water, Environment& environment,
     if (ImGui::BeginTabItem("Lighting")) {
       ImGui::ColorEdit3("Sky Color", glm::value_ptr(environment.skyColor));
       ImGui::ColorEdit3("Light Color", glm::value_ptr(environment.lightColor));
-      ImGui::SliderFloat3(
-          "Direction", glm::value_ptr(environment.lightDirection), -1.0f, 1.0f);
+      ImGui::DragFloat3("Direction", glm::value_ptr(environment.lightDirection),
+                        -1.0f, 1.0f);
 
       ImGui::Separator();
 

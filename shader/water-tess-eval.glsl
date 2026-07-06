@@ -28,6 +28,8 @@ uniform float u_iterationMult;
 out vec3 p_fragPosition;
 out vec3 p_color;
 out vec3 p_normal;
+out float p_jacobian;
+out vec2 p_derivative;
 
 // Fractal wave synthesis (FBM-like sum of directional exponential waves)
 //
@@ -56,12 +58,12 @@ out vec3 p_normal;
 // a fractal (FBM) ocean surface. Position is also advected by the
 // wave gradient (drag term) to introduce nonlinear wave interaction.
 
-vec3 getWavesFBM(vec2 position) {
+vec4 getWavesFBM(vec2 position) {
     float distanceToCamera = length(u_viewPosition.xz - position);
 
     // Reduce number of iteration if the vertex is far to be seen
     int maxIter = max(4, int(float(u_waveIteration) *
-                    (1.0 - clamp(distanceToCamera / 2000.0, 0.0, 0.85))));
+                    (1.0 - clamp(distanceToCamera / 1500.0, 0.0, 0.85))));
 
     // float iteration = 0.0;
     float amplitude = u_amplitude;
@@ -99,7 +101,9 @@ vec3 getWavesFBM(vec2 position) {
         speed *= u_speedMult;
     }
 
-    return vec3(derivative.x, height, derivative.y);
+    float jacobian = (1.0 + derivative.x) * (1.0 + derivative.y);
+
+    return vec4(derivative.x, height, derivative.y, jacobian);
 }
 
 void main() {
@@ -111,7 +115,7 @@ void main() {
             mix(gl_in[1].gl_Position.xy, gl_in[2].gl_Position.xy, u),
             v
         );
-    vec3 waves = getWavesFBM(position);
+    vec4 waves = getWavesFBM(position);
 
     vec3 finalPosition = vec3(position.x, waves.y, position.y);
     vec4 worldPosition = u_model * vec4(finalPosition, 1.0);
@@ -119,6 +123,8 @@ void main() {
 
     gl_Position = u_projection * worldPosition;
     p_fragPosition = worldPosition.xyz;
-    p_color = u_color;
+    p_derivative = waves.xz;
+    p_jacobian = waves.w;
     p_normal = normalize(u_imodel * normal);
+    p_color = u_color;
 }

@@ -45,18 +45,18 @@ void main() {
 
         bool culled = false;
         vec4 frustumPlane[6] = {
-            u_FPLeft,
-            u_FPRight,
-            u_FPBottom,
-            u_FPTop,
-            u_FPNear,
-            u_FPFar
-        };
+                u_FPLeft,
+                u_FPRight,
+                u_FPBottom,
+                u_FPTop,
+                u_FPNear,
+                u_FPFar
+            };
 
         for (int i = 0; i < 6; i++) {
             if (AABBOutsidePlane(pmin, pmax, frustumPlane[i])) {
                 culled = true;
-                break ;
+                break;
             }
         }
 

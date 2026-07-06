@@ -1,8 +1,8 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-constexpr int WINDOW_WIDTH = 1280;
-constexpr int WINDOW_HEIGHT = 720;
+constexpr int WINDOW_WIDTH = 1600;
+constexpr int WINDOW_HEIGHT = 900;
 constexpr const char* WINDOW_TITLE = "OpenGL - Water";
 
 constexpr const char* SKYBOX_FACES[6] = {
