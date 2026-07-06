@@ -9,7 +9,9 @@ A procedural ocean renderer written in **C++17** and **OpenGL 4.6**. The project
 * Hardware tessellation with distance-based LOD
 * GPU frustum culling for efficient rendering
 * Cubemap skybox with procedural sun
-* Blinn-Phong lighting model
+* Physically Based Rendering (PBR) with Cook-Torrance BRDF
+* Subsurface scattering for transmitted light through waves
+* Sea foam generation from wave Jacobian and steepness
 * Distance and height fog post-processing
 * Real-time parameter editing with Dear ImGui
 * Free-fly camera controls
@@ -62,6 +64,9 @@ make
 * Tessellation-based ocean mesh generation
 * Distance-adaptive tessellation levels
 * GPU-side frustum culling
+* Cook-Torrance BRDF with GGX normal distribution and Schlick-GGX geometry
+* Subsurface scattering approximation
+* Jacobian-based sea foam rendering
 * Runtime-configurable rendering parameters
 
 ## References
@@ -70,3 +75,5 @@ make
 - [**Acerola** — How Games Fake Water](https://youtu.be/PH9q0HNBjT4?si=kZ0-5nDRtUmomY7x)
 - [**GPU Gems** — Effective Water Simulation from Physical Models](https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-1-effective-water-simulation-physical-models)
 - [**Wikipedia** — Blinn-Phong Reflection Model](https://en.wikipedia.org/wiki/Blinn%E2%80%93Phong_reflection_model)
+- [**LearnOpenGL** — PBR Theory](https://learnopengl.com/PBR/Theory)
+- [**NVIDIA GPU Gems** — Fast Subsurface Scattering](https://developer.nvidia.com/gpugems/gpugems2/part-ii-shading-lighting-and-shadows/chapter-16-fast-subsurface-scattering)
