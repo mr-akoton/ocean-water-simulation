@@ -1,12 +1,12 @@
 {
-    "amplitude": 8.0,
-    "amplitudeMult": 0.8199999928474426,
+    "amplitude": 6.0,
+    "amplitudeMult": 0.800000011920929,
     "baseReflectance": [
         0.05882352963089943,
         0.05882352963089943,
         0.05882352963089943
     ],
-    "drag": 1.75,
+    "drag": 1.5,
     "emissivity": [
         0.09058055281639099,
         0.14901961386203766,
@@ -18,9 +18,9 @@
         0.8872548937797546,
         0.8843126893043518
     ],
-    "foamHeight": 1.0,
+    "foamHeight": 0.7900000214576721,
     "foamJacobian": 1.5,
-    "foamSteepness": 1.0,
+    "foamSteepness": 0.5,
     "fogColor": [
         1.0,
         1.0,
@@ -30,10 +30,10 @@
     "fogNear": 0.10000000149011612,
     "fogOffset": 700.0,
     "fogSteepness": 0.009999999776482582,
-    "frequency": 0.02500000037252903,
+    "frequency": 0.029999999329447746,
     "frequencyMult": 1.1799999475479126,
     "iterationMult": 1.1799999475479126,
-    "iterations": 45,
+    "iterations": 64,
     "lightColor": [
         0.936274528503418,
         0.936274528503418,
@@ -44,10 +44,10 @@
         -0.12999999523162842,
         -1.0
     ],
-    "maxDistance": 1000.0,
+    "maxDistance": 500.0,
     "maxDivision": 64.0,
     "metallic": 0.0,
-    "minDistance": 0.009999999776482582,
+    "minDistance": 0.10000000149011612,
     "minDivision": 1.0,
     "peakMax": 1.0,
     "peakOffset": 0.8899999856948853,

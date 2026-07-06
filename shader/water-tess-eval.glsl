@@ -63,7 +63,7 @@ vec4 getWavesFBM(vec2 position) {
 
     // Reduce number of iteration if the vertex is far to be seen
     int maxIter = max(4, int(float(u_waveIteration) *
-                    (1.0 - clamp(distanceToCamera / 2000.0, 0.0, 0.85))));
+                    (1.0 - clamp(distanceToCamera / 1500.0, 0.0, 0.85))));
 
     // float iteration = 0.0;
     float amplitude = u_amplitude;
